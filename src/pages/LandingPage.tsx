@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Shield, Users, Trophy, UserPlus, LogIn } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
+import WhyChooseSection from '../components/WhyChooseSection';
 import { useAuth } from '../hooks/useAuth';
 
 interface LandingPageProps {
@@ -184,6 +185,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
           />
         </motion.div>
       </div>
+
+      {/* Why Choose SelfLeveling Section */}
+      <WhyChooseSection />
 
       {/* Stats Section */}
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">

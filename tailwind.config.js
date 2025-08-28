@@ -10,6 +10,7 @@ export default {
       },
       fontFamily: {
         'orbitron': ['Orbitron', 'sans-serif'],
+        'inter': ['Inter', 'sans-serif'],
       },
       boxShadow: {
         'glow': '0 0 15px rgba(0, 207, 255, 0.3)',
