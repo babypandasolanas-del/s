@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Shield, Users, Trophy, UserPlus, LogIn } from 'lucide-react';
+import { Zap, Shield, Users, Trophy, UserPlus, LogIn, Crown } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 import WhyChooseSection from '../components/WhyChooseSection';
 import { useAuth } from '../hooks/useAuth';
@@ -43,8 +43,69 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-navy-dark via-slate-900 to-navy-dark">
+      {/* Fixed Header with Auth Buttons */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="fixed top-0 left-0 w-full z-50 p-4 md:px-4 md:py-4 px-3 py-1.5"
+      >
+        <div className="flex justify-end">
+          {!isAuthenticated ? (
+            <div className="flex space-x-3">
+              <motion.button
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: "0 0 20px rgba(0, 240, 255, 0.6)"
+                }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSignUp}
+                className="px-6 py-3 bg-electric-blue text-black font-orbitron font-bold 
+                         rounded-2xl shadow-lg hover:shadow-electric-blue/25 
+                         transition-all duration-300"
+              >
+                <div className="flex items-center gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Sign Up
+                </div>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ 
+                  scale: 1.05,
+                  backgroundColor: "#00F0FF",
+                  color: "#000000"
+                }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSignIn}
+                className="px-6 py-3 bg-transparent border-2 border-electric-blue 
+                         text-electric-blue font-orbitron font-bold rounded-2xl 
+                         shadow-lg transition-all duration-300"
+              >
+                <div className="flex items-center gap-2">
+                  <LogIn className="w-4 h-4" />
+                  Log In
+                </div>
+              </motion.button>
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-3 px-4 py-2 bg-navy-dark/80 
+                       border border-electric-blue/30 rounded-2xl backdrop-blur-sm"
+            >
+              <Crown className="w-5 h-5 text-electric-blue" />
+              <span className="text-white font-orbitron font-medium">
+                Hunter {userName}
+              </span>
+            </motion.div>
+          )}
+        </div>
+      </motion.header>
+
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden pt-20">
         <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/10 to-electric-blue-dark/10" />
         <div className="relative max-w-7xl mx-auto px-4 py-20">
           <motion.div
@@ -87,60 +148,30 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
                 transition={{ delay: 0.4, duration: 0.8 }}
                 className="text-xl md:text-2xl font-orbitron text-electric-blue mb-8 text-glow"
               >
-                Welcome Hunter {userName}, take our assessment
+                Welcome back, Hunter {userName}. Ready for your assessment?
               </motion.p>
             )}
 
-            {!isAuthenticated ? (
+            {!isAuthenticated && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
                 className="mb-12"
               >
-                <div className="bg-gradient-to-r from-electric-blue/10 to-electric-blue-dark/10 border border-electric-blue/30 rounded-xl p-8 max-w-md mx-auto mb-8">
+                <div className="bg-gradient-to-r from-electric-blue/10 to-electric-blue-dark/10 border border-electric-blue/30 rounded-xl p-8 max-w-md mx-auto">
                   <Shield className="w-12 h-12 text-electric-blue mx-auto mb-4" />
                   <h3 className="text-xl font-orbitron font-bold text-white mb-3 text-glow">
-                    Sign up / Log in to begin your assessment
+                    Create Your Hunter Profile
                   </h3>
                   <p className="text-white/80 font-orbitron text-sm">
-                    Create your hunter profile to access the awakening test and daily quest system.
+                    Sign up using the buttons in the top-right corner to access the awakening test and daily quest system.
                   </p>
                 </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleSignUp}
-                    className="flex-1 px-6 py-4 bg-gradient-to-r from-electric-blue to-electric-blue-dark 
-                             text-white font-orbitron font-bold text-lg rounded-xl
-                             shadow-glow-strong hover:shadow-electric-blue/25 
-                             border border-electric-blue/50 transition-all duration-300"
-                  >
-                    <div className="flex items-center justify-center gap-3">
-                      <UserPlus className="w-5 h-5" />
-                      Sign Up
-                    </div>
-                  </motion.button>
-
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleSignIn}
-                    className="flex-1 px-6 py-4 bg-navy-dark/80 hover:bg-navy-dark 
-                             text-white font-orbitron font-bold text-lg rounded-xl
-                             border border-electric-blue/50 hover:border-electric-blue
-                             transition-all duration-300"
-                  >
-                    <div className="flex items-center justify-center gap-3">
-                      <LogIn className="w-5 h-5" />
-                      Log In
-                    </div>
-                  </motion.button>
-                </div>
               </motion.div>
-            ) : (
+            )}
+
+            {isAuthenticated && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
