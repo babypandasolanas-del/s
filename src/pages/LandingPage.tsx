@@ -115,27 +115,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
             className="text-center"
           >
             <motion.h1 
-              className="text-6xl md:text-8xl font-orbitron font-black mb-8 text-glow-strong"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="text-3xl md:text-5xl font-orbitron font-bold mb-8 text-white"
               style={{
-                background: 'linear-gradient(45deg, #00CFFF, #FFFFFF, #00CFFF)',
-                backgroundSize: '200% 200%',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
-                textShadow: '0 0 50px rgba(0, 207, 255, 0.6)',
-                animation: 'gradient 3s ease infinite'
+                textShadow: '0 0 20px rgba(0, 240, 255, 0.6), 0 0 40px rgba(0, 240, 255, 0.3)'
               }}
             >
-              Awaken Your
-              <br />
-              Hunter System
+              Awaken Your Hunter System
             </motion.h1>
             
             <motion.p
-              initial={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-xl md:text-2xl font-orbitron text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed text-glow"
+              transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+              className="text-lg md:text-xl font-orbitron mb-12 max-w-3xl mx-auto leading-relaxed"
+              style={{ color: '#9BE8FF' }}
             >
               Transform your life into an RPG adventure. Complete daily quests, level up your stats, 
               and become the main character of your own story.
@@ -143,50 +139,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
             
             {isAuthenticated && (
               <motion.p
-                initial={{ opacity: 0 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="text-xl md:text-2xl font-orbitron text-electric-blue mb-8 text-glow"
+                transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+                className="text-lg md:text-xl font-orbitron mb-8"
+                style={{ color: '#9BE8FF' }}
               >
                 Welcome back, Hunter {userName}. Ready for your assessment?
               </motion.p>
             )}
 
-            {!isAuthenticated && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="mb-12"
-              >
-                <div className="bg-gradient-to-r from-electric-blue/10 to-electric-blue-dark/10 border border-electric-blue/30 rounded-xl p-8 max-w-md mx-auto">
-                  <Shield className="w-12 h-12 text-electric-blue mx-auto mb-4" />
-                  <h3 className="text-xl font-orbitron font-bold text-white mb-3 text-glow">
-                    Create Your Hunter Profile
-                  </h3>
-                  <p className="text-white/80 font-orbitron text-sm">
-                    Sign up using the buttons in the top-right corner to access the awakening test and daily quest system.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {isAuthenticated && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleStartTest}
-                className="px-8 py-4 bg-gradient-to-r from-electric-blue to-electric-blue-dark 
-                         text-white font-orbitron font-bold text-xl rounded-xl
-                         shadow-glow-strong hover:shadow-electric-blue/25 
-                         border border-electric-blue/50 transition-all duration-300"
-              >
-                <div className="flex items-center gap-3">
-                  <Zap className="w-6 h-6" />
-                  Begin Hunter Assessment
-                </div>
-              </motion.button>
-            )}
+            <motion.button
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: "0 0 30px rgba(0, 240, 255, 0.8), 0 0 60px rgba(0, 240, 255, 0.4)"
+              }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleStartTest}
+              className="px-8 py-4 text-black font-orbitron font-bold text-xl rounded-2xl
+                       shadow-lg transition-all duration-300"
+              style={{
+                backgroundColor: '#00F0FF',
+                boxShadow: '0 0 20px rgba(0, 240, 255, 0.4)'
+              }}
+            >
+              Take Your Assessment
+            </motion.button>
           </motion.div>
         </div>
       </div>
