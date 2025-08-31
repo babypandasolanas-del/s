@@ -56,7 +56,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     if (!password) {
       newErrors.password = 'Password is required';
     } else if (!validatePassword(password)) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = 'Password must contain at least 6 characters with uppercase, lowercase, number, and special character';
     }
 
     if (mode === 'signup' && password !== confirmPassword) {

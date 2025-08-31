@@ -146,7 +146,22 @@ export const validateEmail = (email: string): boolean => {
 
 // Password validation
 export const validatePassword = (password: string): boolean => {
-  return password.length >= 6;
+  // Check minimum length
+  if (password.length < 6) return false;
+  
+  // Check for at least one lowercase letter
+  if (!/[a-z]/.test(password)) return false;
+  
+  // Check for at least one uppercase letter
+  if (!/[A-Z]/.test(password)) return false;
+  
+  // Check for at least one digit
+  if (!/[0-9]/.test(password)) return false;
+  
+  // Check for at least one special character
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|<>?,./`~]/.test(password)) return false;
+  
+  return true;
 };
 
 // Name validation
