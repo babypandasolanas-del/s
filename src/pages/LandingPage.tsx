@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Zap, Shield, Users, Trophy, UserPlus, LogIn, Crown } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 import WhyChooseSection from '../components/WhyChooseSection';
+import StatsCarousel from '../components/StatsCarousel';
 import { useAuth } from '../hooks/useAuth';
 
 interface LandingPageProps {
@@ -203,19 +204,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
 
       {/* Stats Section */}
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-4xl font-orbitron font-bold text-white mb-12 text-glow">Master Six Core Stats</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          {['Mind', 'Body', 'Discipline', 'Lifestyle', 'Willpower', 'Focus'].map((stat) => (
-            <motion.div
-              key={stat}
-              whileHover={{ scale: 1.05 }}
-              className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-6
-                         backdrop-blur-sm hover:border-electric-blue/60 transition-all duration-300"
-            >
-              <h3 className="text-electric-blue font-orbitron font-bold text-lg text-glow">{stat}</h3>
-            </motion.div>
-          ))}
-        </div>
+        <motion.h2 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-4xl font-orbitron font-bold text-white mb-12 text-glow"
+        >
+          Master Six Core Stats
+        </motion.h2>
+        <StatsCarousel />
       </div>
 
       <AuthModal
