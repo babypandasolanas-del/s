@@ -80,10 +80,24 @@ const AuthModal: React.FC<AuthModalProps> = ({
       if (mode === 'signup') {
         result = await signUp(name.trim(), email, password);
         if (result.error) {
-          setErrors({ general: result.error });
+          // Handle specific error types
+          if (result.error.includes('already exists')) {
+            setErrors({ email: 'An account with this email already exists' });
+          } else if (result.error.includes('weak_password')) {
+            setErrors({ password: 'Password must contain uppercase, lowercase, number, and special character' });
+          } else {
+            setErrors({ general: result.error });
+          }
         } else {
-          // Move to OTP verification step
-          setStep('otp');
+          // Check if email confirmation is required
+          if (result.user && !result.user.email_confirmed_at) {
+            setStep('otp');
+          } else {
+            // Email confirmation disabled, user is ready
+            onSuccess();
+            onClose();
+            resetForm();
+          }
         }
       } else {
         result = await signIn(email, password);

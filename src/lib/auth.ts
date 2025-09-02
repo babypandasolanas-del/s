@@ -12,6 +12,17 @@ export interface AuthUser {
 // Sign up new user with name and OTP verification
 export const signUp = async (name: string, email: string, password: string) => {
   try {
+    // First, check if user already exists
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('email')
+      .eq('email', email)
+      .single();
+    
+    if (existingUser) {
+      return { user: null, error: 'User with this email already exists' };
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -19,13 +30,14 @@ export const signUp = async (name: string, email: string, password: string) => {
         data: {
           name: name
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+        emailRedirectTo: `${window.location.origin}`
       }
     });
 
     if (error) throw error;
     return { user: data.user, error: null };
   } catch (error: any) {
+    console.error('Signup error details:', error);
     return { user: null, error: error.message };
   }
 };
