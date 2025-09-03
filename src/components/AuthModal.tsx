@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, User, Shield, CheckCircle } from 'lucide-react';
-import { signUp, signIn, verifyOTP, resendOTP, validateEmail, validatePassword, validateName } from '../lib/auth';
+import { X, Mail, Lock, User, Shield, CheckCircle, Check, AlertCircle } from 'lucide-react';
+import { signUp, signIn, verifyOTP, resendOTP, validateEmail, getPasswordValidation, validateName } from '../lib/auth';
 import GlowingCard from './GlowingCard';
 
 interface AuthModalProps {
@@ -23,7 +23,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -31,10 +30,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
     name?: string;
     email?: string;
     password?: string;
-    confirmPassword?: string;
     otp?: string;
     general?: string;
   }>({});
+  const [passwordValidation, setPasswordValidation] = useState(getPasswordValidation(''));
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordValidation(getPasswordValidation(value));
+  };
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
@@ -55,12 +59,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (!validatePassword(password)) {
-      newErrors.password = 'Password must contain at least 6 characters with uppercase, lowercase, number, and special character';
-    }
-
-    if (mode === 'signup' && password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+    } else if (!passwordValidation.isValid) {
+      newErrors.password = 'Password must meet all requirements';
     }
 
     setErrors(newErrors);
@@ -166,9 +166,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setName('');
     setEmail('');
     setPassword('');
-    setConfirmPassword('');
     setOtpCode('');
     setErrors({});
+    setPasswordValidation(getPasswordValidation(''));
   };
 
   const handleSwitchMode = (newMode: 'signup' | 'login') => {
@@ -305,7 +305,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       <input
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => handlePasswordChange(e.target.value)}
                         className={`
                           w-full pl-10 pr-4 py-3 bg-navy-dark/80 border rounded-lg
                           font-orbitron text-white placeholder-white/50
@@ -322,43 +322,46 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     {errors.password && (
                       <p className="text-red-400 font-orbitron text-sm mt-1">{errors.password}</p>
                     )}
+                    
+                    {/* Password Validation Checklist */}
+                    {mode === 'signup' && password && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="mt-3 p-4 bg-navy-dark/60 border border-electric-blue/20 rounded-lg"
+                      >
+                        <h4 className="text-white font-orbitron font-medium text-sm mb-3">Password Requirements:</h4>
+                        <div className="space-y-2">
+                          <ValidationItem
+                            isValid={passwordValidation.hasMinLength}
+                            text="At least 8 characters"
+                          />
+                          <ValidationItem
+                            isValid={passwordValidation.hasUppercase}
+                            text="One uppercase letter (A-Z)"
+                          />
+                          <ValidationItem
+                            isValid={passwordValidation.hasLowercase}
+                            text="One lowercase letter (a-z)"
+                          />
+                          <ValidationItem
+                            isValid={passwordValidation.hasNumber}
+                            text="One number (0-9)"
+                          />
+                          <ValidationItem
+                            isValid={passwordValidation.hasSpecialChar}
+                            text="One special character (!@#$%^&*)"
+                          />
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
-
-                  {mode === 'signup' && (
-                    <div>
-                      <label className="block text-white font-orbitron font-medium mb-2">
-                        Confirm Password
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-electric-blue" />
-                        <input
-                          type="password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          className={`
-                            w-full pl-10 pr-4 py-3 bg-navy-dark/80 border rounded-lg
-                            font-orbitron text-white placeholder-white/50
-                            focus:outline-none focus:ring-2 focus:ring-electric-blue/50
-                            transition-all duration-300
-                            ${errors.confirmPassword 
-                              ? 'border-red-400/50 focus:border-red-400' 
-                              : 'border-electric-blue/30 focus:border-electric-blue'
-                            }
-                          `}
-                          placeholder="Confirm your password"
-                        />
-                      </div>
-                      {errors.confirmPassword && (
-                        <p className="text-red-400 font-orbitron text-sm mt-1">{errors.confirmPassword}</p>
-                      )}
-                    </div>
-                  )}
 
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isLoading || (mode === 'signup' && !passwordValidation.isValid)}
                     className="w-full py-4 bg-gradient-to-r from-electric-blue to-electric-blue-dark 
                              text-white font-orbitron font-bold text-lg rounded-lg
                              shadow-glow-strong hover:shadow-electric-blue/25 
@@ -495,6 +498,37 @@ const AuthModal: React.FC<AuthModalProps> = ({
         </motion.div>
       </motion.div>
     </AnimatePresence>
+  );
+};
+
+// Password Validation Item Component
+const ValidationItem: React.FC<{ isValid: boolean; text: string }> = ({ isValid, text }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="flex items-center gap-2"
+    >
+      <div className={`
+        w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300
+        ${isValid 
+          ? 'bg-green-500/20 border border-green-400/50' 
+          : 'bg-red-500/20 border border-red-400/50'
+        }
+      `}>
+        {isValid ? (
+          <Check className="w-2.5 h-2.5 text-green-400" />
+        ) : (
+          <AlertCircle className="w-2.5 h-2.5 text-red-400" />
+        )}
+      </div>
+      <span className={`
+        font-orbitron text-xs transition-colors duration-300
+        ${isValid ? 'text-green-400' : 'text-red-400'}
+      `}>
+        {text}
+      </span>
+    </motion.div>
   );
 };
 

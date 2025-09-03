@@ -158,22 +158,19 @@ export const validateEmail = (email: string): boolean => {
 
 // Password validation
 export const validatePassword = (password: string): boolean => {
-  // Check minimum length
-  if (password.length < 6) return false;
-  
-  // Check for at least one lowercase letter
-  if (!/[a-z]/.test(password)) return false;
-  
-  // Check for at least one uppercase letter
-  if (!/[A-Z]/.test(password)) return false;
-  
-  // Check for at least one digit
-  if (!/[0-9]/.test(password)) return false;
-  
-  // Check for at least one special character
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|<>?,./`~]/.test(password)) return false;
-  
-  return true;
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+  return regex.test(password);
+};
+
+export const getPasswordValidation = (password: string) => {
+  return {
+    hasLowercase: /[a-z]/.test(password),
+    hasUppercase: /[A-Z]/.test(password),
+    hasNumber: /\d/.test(password),
+    hasSpecialChar: /[@$!%*?&#]/.test(password),
+    hasMinLength: password.length >= 8,
+    isValid: validatePassword(password)
+  };
 };
 
 // Name validation
