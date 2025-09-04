@@ -4,6 +4,7 @@ import { Zap, Shield, Users, Trophy, UserPlus, LogIn, Crown } from 'lucide-react
 import AuthModal from '../components/AuthModal';
 import WhyChooseSection from '../components/WhyChooseSection';
 import StatsCarousel from '../components/StatsCarousel';
+import Footer from '../components/Footer';
 import { useAuth } from '../hooks/useAuth';
 
 interface LandingPageProps {
@@ -215,6 +216,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
         </motion.h2>
         <StatsCarousel />
       </div>
+
+      <Footer />
 
       <AuthModal
         isOpen={showAuthModal}
