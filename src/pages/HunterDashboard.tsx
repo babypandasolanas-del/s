@@ -17,6 +17,7 @@ import RankBadge from '../components/RankBadge';
 import ProgressBar from '../components/ProgressBar';
 import SystemNotification from '../components/SystemNotification';
 import NotificationSetup from '../components/NotificationSetup';
+import DiscordButton from '../components/DiscordButton';
 import { useNotifications } from '../hooks/useNotifications';
 import { useAuth } from '../hooks/useAuth';
 
@@ -280,6 +281,20 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                     <p>🔥 True hunters never give up, no matter how difficult the path</p>
                   </div>
                 </div>
+              </div>
+            </GlowingCard>
+
+            {/* Discord Community */}
+            <GlowingCard className="mt-6">
+              <div className="text-center">
+                <h3 className="text-xl font-orbitron font-bold text-white mb-4 text-glow">
+                  Join the Hunter Community
+                </h3>
+                <p className="text-white/80 font-orbitron mb-6 leading-relaxed">
+                  Connect with thousands of hunters, share your progress, get motivation, 
+                  and participate in exclusive community challenges.
+                </p>
+                <DiscordButton />
               </div>
             </GlowingCard>
           </div>

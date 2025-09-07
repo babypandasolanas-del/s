@@ -8,9 +8,11 @@ import OfflineIndicator from './components/OfflineIndicator';
 import AuthGuard from './components/AuthGuard';
 import LandingPage from './pages/LandingPage';
 import NewAwakeningTest from './pages/NewAwakeningTest';
+import LockedRankReveal from './pages/LockedRankReveal';
 import RankReveal from './pages/RankReveal';
 import HunterDashboard from './pages/HunterDashboard';
 import { useAuth } from './hooks/useAuth';
+import { useSubscription } from './hooks/useSubscription';
 import { signOut } from './lib/auth';
 import { 
   createUserProfile, 
@@ -20,10 +22,11 @@ import {
   getUserQuests 
 } from './lib/supabase';
 
-type AppState = 'landing' | 'test' | 'reveal' | 'dashboard';
+type AppState = 'landing' | 'test' | 'locked-reveal' | 'reveal' | 'dashboard';
 
 function App() {
   const { user, profile, loading, isAuthenticated } = useAuth();
+  const { subscriptionStatus, isActive } = useSubscription();
   const [currentState, setCurrentState] = useState<AppState>('landing');
   const [showAuthGuard, setShowAuthGuard] = useState(false);
   const [assessmentResults, setAssessmentResults] = useState<{
@@ -88,23 +91,36 @@ function App() {
       // Calculate stats from answers
       const stats = calculateStatsFromAnswers(answers);
       
-      // Create user record in users table
-      await createUserProfile({
-        id: user.id,
-        email: user.email!,
-        rank: rank as any,
-        total_xp: totalScore * 2,
-        streak_days: 0
-      });
+      // Only create user profile, don't reveal rank yet
+      if (!profile) {
+        await createUserProfile({
+          id: user.id,
+          email: user.email!,
+          rank: rank as any,
+          total_xp: totalScore * 2,
+          streak_days: 0
+        });
 
-      // Create user stats record
-      await createUserStats(user.id, stats);
+        // Create user stats record
+        await createUserStats(user.id, stats);
+      }
 
       setAssessmentResults({ totalScore, answers, rank });
-      setCurrentState('reveal');
+      
+      // Check subscription status to determine next screen
+      if (isActive) {
+        setCurrentState('reveal');
+      } else {
+        setCurrentState('locked-reveal');
+      }
     } catch (error) {
       console.error('Error saving assessment results:', error);
     }
+  };
+
+  const handleUpgradeSuccess = () => {
+    // User has successfully upgraded, show rank reveal
+    setCurrentState('reveal');
   };
 
   const handleRankRevealComplete = async (dailyQuests: any[]) => {
@@ -225,6 +241,13 @@ function App() {
 
         {currentState === 'test' && (
           <NewAwakeningTest onComplete={handleTestComplete} />
+        )}
+
+        {currentState === 'locked-reveal' && assessmentResults && (
+          <LockedRankReveal 
+            totalScore={assessmentResults.totalScore}
+            onUpgradeSuccess={handleUpgradeSuccess}
+          />
         )}
 
         {currentState === 'reveal' && assessmentResults && (
