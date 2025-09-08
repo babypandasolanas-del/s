@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -9,6 +10,7 @@ import AuthGuard from './components/AuthGuard';
 import LandingPage from './pages/LandingPage';
 import NewAwakeningTest from './pages/NewAwakeningTest';
 import LockedRankReveal from './pages/LockedRankReveal';
+import UpgradePage from './pages/UpgradePage';
 import RankReveal from './pages/RankReveal';
 import HunterDashboard from './pages/HunterDashboard';
 import { useAuth } from './hooks/useAuth';
@@ -22,7 +24,7 @@ import {
   getUserQuests 
 } from './lib/supabase';
 
-type AppState = 'landing' | 'test' | 'locked-reveal' | 'reveal' | 'dashboard';
+type AppState = 'landing' | 'test' | 'locked-reveal' | 'reveal' | 'dashboard' | 'upgrade';
 
 function App() {
   const { user, profile, loading, isAuthenticated } = useAuth();
@@ -199,6 +201,10 @@ function App() {
   return (
     <Router>
       <div className="App relative">
+        <Routes>
+          <Route path="/upgrade" element={<UpgradePage />} />
+          <Route path="/*" element={
+            <>
         <PWAInstallPrompt />
         <OfflineIndicator />
         
@@ -246,7 +252,6 @@ function App() {
         {currentState === 'locked-reveal' && assessmentResults && (
           <LockedRankReveal 
             totalScore={assessmentResults.totalScore}
-            onUpgradeSuccess={handleUpgradeSuccess}
           />
         )}
 
@@ -275,6 +280,9 @@ function App() {
             setCurrentState('landing');
           }} />
         )}
+            </>
+          } />
+        </Routes>
       </div>
     </Router>
   );

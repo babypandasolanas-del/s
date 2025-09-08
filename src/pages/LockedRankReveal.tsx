@@ -2,70 +2,26 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Crown, Zap, ArrowRight } from 'lucide-react';
 import GlowingCard from '../components/GlowingCard';
-import PayPalSubscription from '../components/PayPalSubscription';
 import { useAuth } from '../hooks/useAuth';
-import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface LockedRankRevealProps {
   totalScore: number;
-  onUpgradeSuccess: () => void;
 }
 
 const LockedRankReveal: React.FC<LockedRankRevealProps> = ({ 
-  totalScore, 
-  onUpgradeSuccess 
+  totalScore
 }) => {
-  const [showPayment, setShowPayment] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const { user, userName } = useAuth();
+  const navigate = useNavigate();
 
-  const handlePaymentSuccess = async () => {
-    setIsProcessing(true);
-    
-    try {
-      // Refresh user profile to get updated subscription status
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for webhook processing
-      
-      // Check if subscription is now active
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('subscription_status')
-        .eq('id', user?.id)
-        .single();
-
-      if (profile?.subscription_status === 'active') {
-        onUpgradeSuccess();
-      } else {
-        // Retry after a short delay
-        setTimeout(async () => {
-          const { data: retryProfile } = await supabase
-            .from('profiles')
-            .select('subscription_status')
-            .eq('id', user?.id)
-            .single();
-          
-          if (retryProfile?.subscription_status === 'active') {
-            onUpgradeSuccess();
-          }
-        }, 3000);
-      }
-    } catch (error) {
-      console.error('Error processing payment success:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handlePaymentError = (error: any) => {
-    console.error('Payment error:', error);
-    setIsProcessing(false);
+  const handleUpgradeClick = () => {
+    navigate('/upgrade');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-navy-dark via-slate-900 to-navy-dark py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {!showPayment ? (
-          // Locked Rank Screen
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -160,7 +116,7 @@ const LockedRankReveal: React.FC<LockedRankRevealProps> = ({
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setShowPayment(true)}
+                onClick={handleUpgradeClick}
                 className="px-8 py-4 bg-gradient-to-r from-electric-blue to-electric-blue-dark 
                          text-white font-orbitron font-bold text-xl rounded-xl
                          shadow-glow-strong hover:shadow-electric-blue/25 
@@ -174,64 +130,6 @@ const LockedRankReveal: React.FC<LockedRankRevealProps> = ({
               </motion.button>
             </motion.div>
           </motion.div>
-        ) : (
-          // Payment Screen
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center"
-          >
-            <motion.h1 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-5xl font-orbitron font-bold text-white mb-8 text-glow-strong"
-            >
-              ⚔️ UNLOCK HUNTER SYSTEM
-            </motion.h1>
-
-            <GlowingCard className="max-w-2xl mx-auto">
-              {isProcessing ? (
-                <div className="text-center py-12">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-electric-blue/20 to-electric-blue-dark/20 rounded-full mb-4">
-                    <div className="w-8 h-8 border-4 border-electric-blue/30 border-t-electric-blue rounded-full animate-spin"></div>
-                  </div>
-                  <h3 className="text-xl font-orbitron font-bold text-white mb-2 text-glow">
-                    Activating Hunter System...
-                  </h3>
-                  <p className="text-white/80 font-orbitron">
-                    Please wait while we unlock your rank and prepare your dashboard.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="text-center mb-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-electric-blue/20 to-electric-blue-dark/20 rounded-lg border border-electric-blue/40 mb-4">
-                      <Crown className="w-5 h-5 text-electric-blue" />
-                      <span className="text-electric-blue font-orbitron font-bold text-glow">HUNTER PREMIUM</span>
-                    </div>
-                    <h2 className="text-2xl font-orbitron font-bold text-white mb-4 text-glow">
-                      Complete Your Hunter Registration
-                    </h2>
-                  </div>
-
-                  <PayPalSubscription 
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                  />
-
-                  <div className="mt-6 text-center">
-                    <button
-                      onClick={() => setShowPayment(false)}
-                      className="text-white/60 font-orbitron text-sm hover:text-white transition-colors"
-                    >
-                      ← Back to rank reveal
-                    </button>
-                  </div>
-                </>
-              )}
-            </GlowingCard>
-          </motion.div>
-        )}
       </div>
     </div>
   );
