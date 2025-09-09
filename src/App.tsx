@@ -8,6 +8,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
 import AuthGuard from './components/AuthGuard';
 import LandingPage from './pages/LandingPage';
+import Contact from './pages/Contact';
 import NewAwakeningTest from './pages/NewAwakeningTest';
 import LockedRankReveal from './pages/LockedRankReveal';
 import UpgradePage from './pages/UpgradePage';
@@ -203,6 +204,7 @@ function App() {
       <div className="App relative">
         <Routes>
           <Route path="/upgrade" element={<UpgradePage />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/*" element={
             <>
         <PWAInstallPrompt />

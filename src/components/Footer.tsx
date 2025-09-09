@@ -47,6 +47,18 @@ const Footer: React.FC = () => {
       {/* Navigation Links */}
       <div className="flex flex-wrap justify-center gap-6 text-sm">
         <Link
+          to="/contact"
+          className="text-gray-400 hover:text-white hover:underline transition-colors"
+        >
+          Contact Us
+        </Link>
+        <Link
+          to="/about"
+          className="text-gray-400 hover:text-white hover:underline transition-colors"
+        >
+          About Us
+        </Link>
+        <Link
           to="/privacy"
           className="text-gray-400 hover:text-white hover:underline transition-colors"
         >
@@ -57,18 +69,6 @@ const Footer: React.FC = () => {
           className="text-gray-400 hover:text-white hover:underline transition-colors"
         >
           Terms of Service
-        </Link>
-        <Link
-          to="/about"
-          className="text-gray-400 hover:text-white hover:underline transition-colors"
-        >
-          About Us
-        </Link>
-        <Link
-          to="/contact"
-          className="text-gray-400 hover:text-white hover:underline transition-colors"
-        >
-          Contact
         </Link>
       </div>
 

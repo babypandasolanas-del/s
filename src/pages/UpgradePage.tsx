@@ -38,7 +38,7 @@ const UpgradePage: React.FC = () => {
           },
           createSubscription: function(data: any, actions: any) {
             return actions.subscription.create({
-              plan_id: 'P-6AA83653XV383431ENC7EYSY'
+              plan_id: 'P-YOUR-NEW-PLAN-ID-FOR-14-99'
             });
           },
           onApprove: async function(data: any, actions: any) {
@@ -86,7 +86,7 @@ const UpgradePage: React.FC = () => {
             console.log('Payment cancelled:', data);
             setIsProcessing(false);
           }
-        }).render('#paypal-button-container-P-6AA83653XV383431ENC7EYSY');
+        }).render('#paypal-button-container-P-YOUR-NEW-PLAN-ID-FOR-14-99');
       }
     };
 
@@ -194,8 +194,8 @@ const UpgradePage: React.FC = () => {
             </div>
 
             <div className="text-center mb-6">
-              <div className="text-4xl font-orbitron font-bold text-white mb-2 text-glow">
-                $9.99<span className="text-lg text-electric-blue">/month</span>
+              <div className="text-3xl font-orbitron font-bold text-white mb-2 text-glow">
+                $14.99<span className="text-lg text-electric-blue">/month</span>
               </div>
               <p className="text-white/80 font-orbitron text-sm">
                 Cancel anytime • Secure PayPal payment
@@ -210,7 +210,7 @@ const UpgradePage: React.FC = () => {
                 </div>
               ) : (
                 <div 
-                  id="paypal-button-container-P-6AA83653XV383431ENC7EYSY" 
+                  id="paypal-button-container-P-YOUR-NEW-PLAN-ID-FOR-14-99" 
                   ref={paypalRef}
                   className="w-full max-w-sm"
                 />
