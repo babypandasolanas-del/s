@@ -61,6 +61,14 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
     }
   };
 
+  const showSoloLevelingNotification = () => {
+    setNotification({ 
+      show: true, 
+      message: 'Your heart will stop in 0.02 seconds if you choose not to accept. Will you accept?', 
+      type: 'warning' 
+    });
+  };
+
   const completeQuest = (questId: string) => {
     setDailyQuests(quests => 
       quests.map(quest => {
