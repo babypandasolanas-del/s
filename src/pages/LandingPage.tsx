@@ -254,8 +254,8 @@ const FeatureCard: React.FC<{
       }}
     >
       <div className="text-electric-blue mb-4">{icon}</div>
-      <h3 className="text-xl font-orbitron font-bold text-white mb-3 text-glow">{title}</h3>
-      <p className="text-white/80 font-orbitron leading-relaxed">{description}</p>
+      <h3 className="text-xl font-lato font-bold text-white mb-3 text-glow tracking-tight">{title}</h3>
+      <p className="text-white/80 font-lato leading-relaxed">{description}</p>
     </motion.div>
   );
 };
