@@ -251,7 +251,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                           onChange={(e) => setName(e.target.value)}
                           className={`
                             w-full pl-10 pr-4 py-3 bg-navy-dark/80 border rounded-lg
-                            font-orbitron text-white placeholder-white/50
+                            font-lato text-white placeholder-white/50
                             focus:outline-none focus:ring-2 focus:ring-electric-blue/50
                             transition-all duration-300
                             ${errors.name 
