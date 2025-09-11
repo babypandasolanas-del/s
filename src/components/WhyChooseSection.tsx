@@ -108,11 +108,11 @@ const WhyChooseSection: React.FC = () => {
           animate={isInView ? "visible" : "hidden"}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-orbitron font-bold text-white mb-6">
+          <h2 className="text-2xl md:text-4xl font-lato font-bold text-white mb-6 tracking-tight">
               Why Choose SelfLeveling?
           </h2>
           
-          <p className="text-base text-gray-300 font-inter mb-8 max-w-2xl mx-auto">
+          <p className="text-base text-gray-300 font-lato mb-8 max-w-2xl mx-auto">
             Stop struggling alone. Start leveling up like a Hunter.
           </p>
           
@@ -197,7 +197,7 @@ const WhyChooseSection: React.FC = () => {
                 
                 <div className="relative z-10">
                   <h3 
-                    className="text-xl md:text-2xl font-orbitron font-bold text-white mb-4 transition-colors duration-300"
+                    className="text-xl md:text-2xl font-lato font-bold text-white mb-4 transition-colors duration-300 tracking-tight"
                     style={{
                       color: 'white'
                     }}
@@ -211,7 +211,7 @@ const WhyChooseSection: React.FC = () => {
                     {benefit.title}
                   </h3>
                   <p 
-                    className="text-gray-300 font-inter text-base leading-relaxed transition-colors duration-300"
+                    className="text-gray-300 font-lato text-base leading-relaxed transition-colors duration-300"
                     onMouseEnter={(e) => {
                       e.currentTarget.style.color = 'white';
                     }}

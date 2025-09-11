@@ -1,6 +1,14 @@
+/* Import Lato font from Google Fonts with display=swap for optimal loading */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global font application - Apply Lato to all elements */
+* {
+  font-family: 'Lato', sans-serif;
+}
 
 * {
   box-sizing: border-box;
@@ -8,12 +16,38 @@
 
 body {
   margin: 0;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Lato', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #0A0F1C;
   color: #FFFFFF;
   overflow-x: hidden;
+}
+
+/* Heading styles with Lato font and proper hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700; /* Bold for all headings */
+  letter-spacing: -0.025em; /* Tightened letter spacing */
+  text-shadow: 0 0 10px rgba(0, 207, 255, 0.3);
+}
+
+/* Body text elements */
+p, span, div, li, a, button, input, textarea, select, label {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400; /* Regular weight for body text */
+}
+
+/* Interactive elements specific styling */
+button {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700; /* Bold for buttons */
+}
+
+/* Form inputs */
+input, textarea, select {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
 }
 
 /* Custom scrollbar */
@@ -34,13 +68,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #00CFFF, #0099FF);
   box-shadow: 0 0 15px rgba(0, 207, 255, 0.8);
-}
-
-/* Base text glow */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(0, 207, 255, 0.3);
 }
 
 /* Glowing text animation */
@@ -85,6 +112,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Solo Leveling notification styles */
 .solo-notification {
+  font-family: 'Lato', sans-serif;
   background: rgba(10, 15, 28, 0.95);
   border: 2px solid #00CFFF;
   box-shadow: 0 0 20px rgba(0, 207, 255, 0.4),
@@ -94,7 +122,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .solo-notification-title {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Lato', sans-serif;
   font-weight: 800;
   font-size: 0.875rem;
   letter-spacing: 0.1em;
@@ -233,7 +261,7 @@ select:focus {
 
 /* Custom button styles */
 .btn-primary {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Lato', sans-serif;
   font-weight: 600;
   background: linear-gradient(135deg, #00CFFF, #0077FF);
   border: 1px solid rgba(0, 207, 255, 0.5);
@@ -251,7 +279,7 @@ select:focus {
 }
 
 .btn-secondary {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Lato', sans-serif;
   font-weight: 500;
   background: rgba(10, 15, 28, 0.8);
   border: 1px solid rgba(0, 207, 255, 0.3);
@@ -337,7 +365,7 @@ select:focus {
 
 /* Input styles */
 input, select, textarea {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Lato', sans-serif;
   background: rgba(10, 15, 28, 0.8);
   border: 1px solid rgba(0, 207, 255, 0.3);
   color: #FFFFFF;
@@ -350,10 +378,38 @@ input:focus, select:focus, textarea:focus {
   outline: none;
 }
 
-/* Orbitron font weights */
-.font-orbitron-light { font-weight: 400; }
-.font-orbitron-medium { font-weight: 500; }
-.font-orbitron-semibold { font-weight: 600; }
-.font-orbitron-bold { font-weight: 700; }
-.font-orbitron-extrabold { font-weight: 800; }
-.font-orbitron-black { font-weight: 900; }
+/* Lato font weight utilities */
+.font-lato-regular { font-weight: 400; }
+.font-lato-bold { font-weight: 700; }
+
+/* Override any existing font classes */
+.font-display,
+.font-orbitron,
+.font-inter {
+  font-family: 'Lato', sans-serif !important;
+}
+
+/* Responsive typography utilities */
+.responsive-heading-xl {
+  font-size: 1.875rem; /* 30px */
+  line-height: 2.25rem; /* 36px */
+}
+
+@media (min-width: 768px) {
+  .responsive-heading-xl {
+    font-size: 3.75rem; /* 60px */
+    line-height: 1;
+  }
+}
+
+.responsive-heading-lg {
+  font-size: 1.5rem; /* 24px */
+  line-height: 2rem; /* 32px */
+}
+
+@media (min-width: 768px) {
+  .responsive-heading-lg {
+    font-size: 2.25rem; /* 36px */
+    line-height: 2.5rem; /* 40px */
+  }
+}

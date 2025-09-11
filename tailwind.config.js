@@ -9,9 +9,10 @@ export default {
         'electric-blue-dark': '#0077FF',
       },
       fontFamily: {
-        'orbitron': ['Orbitron', 'sans-serif'],
-        'inter': ['Inter', 'sans-serif'],
         'lato': ['Lato', 'sans-serif'],
+        'inter': ['Inter', 'sans-serif'],
+        'orbitron': ['Orbitron', 'sans-serif'],
+        'sans': ['Lato', 'sans-serif'], // Make Lato the default sans-serif
       },
       boxShadow: {
         'glow': '0 0 15px rgba(0, 207, 255, 0.3)',

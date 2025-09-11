@@ -113,8 +113,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
+            className="text-lg md:text-xl font-lato mb-12 max-w-3xl mx-auto leading-relaxed"
+            className="text-3xl md:text-5xl font-lato font-bold mb-8 text-white tracking-tight"
           >
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
