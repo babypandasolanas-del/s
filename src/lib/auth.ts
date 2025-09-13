@@ -12,17 +12,7 @@ export interface AuthUser {
 // Sign up new user with name and OTP verification
 export const signUp = async (name: string, email: string, password: string) => {
   try {
-    // First, check if user already exists
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('email')
-      .eq('email', email)
-      .single();
-    
-    if (existingUser) {
-      return { user: null, error: 'User with this email already exists' };
-    }
-
+    // Simple signup - let Supabase handle user creation
     const { data, error } = await supabase.auth.signUp({
       email,
       password,

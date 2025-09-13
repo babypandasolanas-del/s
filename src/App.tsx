@@ -50,6 +50,28 @@ function App() {
     if (!user) return;
 
     try {
+      // Check if user has a profile first
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      // If no profile exists, create one
+      if (!profileData) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: user.id,
+            email: user.email!,
+            created_at: new Date().toISOString()
+          }]);
+        
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+        }
+      }
+
       // Check if user has completed assessment by looking at users table
       const { data: userData } = await supabase
         .from('users')
@@ -70,7 +92,7 @@ function App() {
           dailyQuests: quests || []
         });
         setCurrentState('dashboard');
-      } else if (profile && !userData) {
+      } else if (user && !userData) {
         // User has profile but no assessment data, show test
         setCurrentState('test');
       }
