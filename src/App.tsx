@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { createClient } from '@supabase/supabase-js';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
 import AuthGuard from './components/AuthGuard';
@@ -24,6 +25,11 @@ import {
   getUserProfile,
   getUserQuests 
 } from './lib/supabase';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 type AppState = 'landing' | 'test' | 'locked-reveal' | 'reveal' | 'dashboard' | 'upgrade';
 
@@ -72,23 +78,23 @@ function App() {
         }
       }
 
-      // Check if user has completed assessment by looking at users table
+      // Check if user has completed assessment by looking at profiles table
       const { data: userData } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
       
-      if (userData && userData.rank && userData.rank !== 'E') {
+      if (userData && userData.subscription_status === 'active') {
         // User has completed assessment, check for today's quests
         const today = new Date().toISOString().split('T')[0];
         const { data: quests } = await getUserQuests(user.id, today);
         
         setHunterData({
-          rank: userData.rank,
-          totalScore: userData.total_xp / 2,
-          streak: userData.streak_days,
-          totalXp: userData.total_xp,
+          rank: 'C', // Default rank for active users
+          totalScore: 75, // Default score
+          streak: 0, // Default streak
+          totalXp: 150, // Default XP
           dailyQuests: quests || []
         });
         setCurrentState('dashboard');
