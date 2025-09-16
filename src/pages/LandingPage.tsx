@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Shield, Users, Trophy, UserPlus, LogIn, Crown } from 'lucide-react';
+import toast from 'react-hot-toast';
 import AuthModal from '../components/AuthModal';
 import WhyChooseSection from '../components/WhyChooseSection';
 import StatsCarousel from '../components/StatsCarousel';
@@ -14,6 +15,7 @@ interface LandingPageProps {
 const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup');
+  const [showFlashMessage, setShowFlashMessage] = useState(false);
   const { isAuthenticated, userName } = useAuth();
 
   const handleAuthSuccess = () => {
@@ -26,7 +28,31 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
 
   const handleStartTest = () => {
     if (isAuthenticated) {
-      onStartTest();
+      // Show flash message before starting test
+      // Option 1: Using react-hot-toast (currently active)
+      toast('Be honest with yourself 💡', {
+        duration: 2000,
+        style: {
+          background: 'rgba(10, 15, 28, 0.95)',
+          color: '#ffffff',
+          border: '1px solid rgba(0, 207, 255, 0.3)',
+          borderRadius: '12px',
+          backdropFilter: 'blur(10px)',
+          fontFamily: 'Orbitron, sans-serif',
+          fontSize: '16px',
+          fontWeight: '600',
+          textShadow: '0 0 10px rgba(0, 207, 255, 0.5)',
+        },
+        icon: '💡',
+      });
+      
+      // Option 2: Inline flash message (commented out)
+      // setShowFlashMessage(true);
+      
+      setTimeout(() => {
+        // setShowFlashMessage(false); // Only needed for inline version
+        onStartTest();
+      }, 2000);
     } else {
       setAuthMode('signup');
       setShowAuthModal(true);
@@ -161,7 +187,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
               }}
               whileTap={{ scale: 0.95 }}
               onClick={handleStartTest}
-              className="px-8 py-4 text-black font-orbitron font-bold text-xl rounded-2xl
+              className="relative px-8 py-4 text-black font-orbitron font-bold text-xl rounded-2xl
                        shadow-lg transition-all duration-300"
               style={{
                 backgroundColor: '#00F0FF',
@@ -169,6 +195,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
               }}
             >
               Take Your Assessment
+              
+              {/* Inline Flash Message (Option 2 - currently commented out) */}
+              {showFlashMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                  animate={{ opacity: 1, y: -60, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                  className="absolute left-1/2 transform -translate-x-1/2 -top-16 
+                           bg-gradient-to-r from-electric-blue/90 to-electric-blue-dark/90 
+                           text-white px-6 py-3 rounded-xl shadow-2xl backdrop-blur-sm
+                           border border-electric-blue/50 font-orbitron font-semibold
+                           whitespace-nowrap z-10"
+                  style={{
+                    boxShadow: '0 0 30px rgba(0, 240, 255, 0.6)',
+                    textShadow: '0 0 10px rgba(255, 255, 255, 0.8)'
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>💡</span>
+                    <span>Be honest with yourself</span>
+                  </div>
+                  
+                  {/* Arrow pointing down to button */}
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 
+                                w-0 h-0 border-l-8 border-r-8 border-t-8 
+                                border-l-transparent border-r-transparent border-t-electric-blue/90">
+                  </div>
+                </motion.div>
+              )}
             </motion.button>
           </motion.div>
         </div>

@@ -32,13 +32,13 @@ const UpgradePage: React.FC = () => {
         window.paypal.Buttons({
           style: {
             shape: 'pill',
-            color: 'gold',
+            color: 'blue',
             layout: 'vertical',
             label: 'subscribe'
           },
           createSubscription: function(data: any, actions: any) {
             return actions.subscription.create({
-              plan_id: 'P-YOUR-NEW-PLAN-ID-FOR-14-99'
+              plan_id: 'P-3ST53432TK471363YNDEZCIA'
             });
           },
           onApprove: async function(data: any, actions: any) {
@@ -63,7 +63,7 @@ const UpgradePage: React.FC = () => {
                 }
               }
 
-              alert("✅ Subscription successful! ID: " + data.subscriptionID);
+              alert("Thanks for subscribing! Your Subscription ID: " + data.subscriptionID);
               
               // Redirect to dashboard after successful payment
               setTimeout(() => {
@@ -86,7 +86,7 @@ const UpgradePage: React.FC = () => {
             console.log('Payment cancelled:', data);
             setIsProcessing(false);
           }
-        }).render('#paypal-button-container-P-YOUR-NEW-PLAN-ID-FOR-14-99');
+        }).render('#paypal-button-container-P-3ST53432TK471363YNDEZCIA');
       }
     };
 
@@ -195,7 +195,7 @@ const UpgradePage: React.FC = () => {
 
             <div className="text-center mb-6">
               <div className="text-3xl font-orbitron font-bold text-white mb-2 text-glow">
-                $14.99<span className="text-lg text-electric-blue">/month</span>
+                $9.99<span className="text-lg text-electric-blue">/month</span>
               </div>
               <p className="text-white/80 font-orbitron text-sm">
                 Cancel anytime • Secure PayPal payment
@@ -210,7 +210,7 @@ const UpgradePage: React.FC = () => {
                 </div>
               ) : (
                 <div 
-                  id="paypal-button-container-P-YOUR-NEW-PLAN-ID-FOR-14-99" 
+                  id="paypal-button-container-P-3ST53432TK471363YNDEZCIA" 
                   ref={paypalRef}
                   className="w-full max-w-sm"
                 />
