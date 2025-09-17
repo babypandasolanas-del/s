@@ -84,7 +84,7 @@ const RankReveal: React.FC<RankRevealProps> = ({ rank, totalScore, onContinue })
                 transition={{ delay: 2.2, duration: 0.8 }}
                 className="text-3xl font-orbitron font-bold text-electric-blue mb-4 text-glow"
               >
-                Hunter {userName}, you achieved Rank {rank}!
+                {userName}, you achieved Rank {rank}!
               </motion.h2>
               <h3 className="text-2xl font-orbitron font-bold text-white mb-4 text-glow">
                 {getRankDescription(rank as any)}

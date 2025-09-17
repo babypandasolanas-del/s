@@ -10,7 +10,7 @@ export interface AuthUser {
 }
 
 // Sign up new user with name and OTP verification
-export const signUp = async (name: string, email: string, password: string) => {
+export const signUp = async (username: string, email: string, password: string) => {
   try {
     // Simple signup - let Supabase handle user creation
     const { data, error } = await supabase.auth.signUp({
@@ -18,7 +18,7 @@ export const signUp = async (name: string, email: string, password: string) => {
       password,
       options: {
         data: {
-          name: name
+          username: username
         },
         emailRedirectTo: `${window.location.origin}`
       }
@@ -163,9 +163,10 @@ export const getPasswordValidation = (password: string) => {
   };
 };
 
-// Name validation
-export const validateName = (name: string): boolean => {
-  return name.trim().length >= 2;
+// Username validation - only letters allowed
+export const validateUsername = (username: string): boolean => {
+  const regex = /^[A-Za-z]+$/;
+  return regex.test(username) && username.length >= 2;
 };
 
 // Auth state change listener

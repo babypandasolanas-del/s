@@ -173,7 +173,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartTest }) => {
                 className="text-lg md:text-xl font-orbitron mb-8"
                 style={{ color: '#9BE8FF' }}
               >
-                Welcome back, Hunter {userName}. Ready for your assessment?
+                Welcome back, {userName}. Ready for your assessment?
               </motion.p>
             )}
 

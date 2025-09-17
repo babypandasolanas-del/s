@@ -80,7 +80,7 @@ const LockedRankReveal: React.FC<LockedRankRevealProps> = ({
               className="mb-8"
             >
               <h2 className="text-3xl font-orbitron font-bold text-electric-blue mb-4 text-glow">
-                Hunter {userName}, your rank is ready to be revealed! ⚔️
+                {userName}, your rank is ready to be revealed! ⚔️
               </h2>
               <div className="text-xl font-orbitron text-white/90 text-glow mb-6">
                 Assessment Score: <span className="text-electric-blue font-bold">{totalScore}/150</span>

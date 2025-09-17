@@ -118,7 +118,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
               transition={{ delay: 0.3 }}
               className="text-electric-blue font-orbitron text-xl text-glow"
             >
-              Welcome back, Hunter {userName}
+              Welcome back, {userName}
             </motion.p>
           </div>
         </motion.div>

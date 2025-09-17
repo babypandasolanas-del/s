@@ -20,14 +20,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
   onSwitchMode 
 }) => {
   const [step, setStep] = useState<'form' | 'otp'>('form');
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [errors, setErrors] = useState<{
-    name?: string;
+    username?: string;
     email?: string;
     password?: string;
     otp?: string;
@@ -44,10 +44,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
     const newErrors: typeof errors = {};
 
     if (mode === 'signup') {
-      if (!name.trim()) {
-        newErrors.name = 'Name is required';
-      } else if (!validateName(name)) {
-        newErrors.name = 'Name must be at least 2 characters';
+      if (!username.trim()) {
+        newErrors.username = 'Username is required';
+      } else if (!validateUsername(username)) {
+        newErrors.username = 'Username must contain only letters (a-z, A-Z) and be at least 2 characters';
       }
     }
 
@@ -78,7 +78,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     try {
       let result;
       if (mode === 'signup') {
-        result = await signUp(name.trim(), email, password);
+        result = await signUp(username.trim(), email, password);
         if (result.error) {
           // Handle specific error types
           if (result.error.includes('already exists')) {
@@ -163,7 +163,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const resetForm = () => {
     setStep('form');
-    setName('');
+    setUsername('');
     setEmail('');
     setPassword('');
     setOtpCode('');
@@ -241,29 +241,29 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   {mode === 'signup' && (
                     <div>
                       <label className="block text-white font-orbitron font-medium mb-2">
-                        Hunter Name
+                        Username
                       </label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-electric-blue" />
                         <input
                           type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
                           className={`
                             w-full pl-10 pr-4 py-3 bg-navy-dark/80 border rounded-lg
                             font-lato text-white placeholder-white/50
                             focus:outline-none focus:ring-2 focus:ring-electric-blue/50
                             transition-all duration-300
-                            ${errors.name 
+                            ${errors.username 
                               ? 'border-red-400/50 focus:border-red-400' 
                               : 'border-electric-blue/30 focus:border-electric-blue'
                             }
                           `}
-                          placeholder="Enter your hunter name"
+                          placeholder="Enter username (letters only)"
                         />
                       </div>
-                      {errors.name && (
-                        <p className="text-red-400 font-orbitron text-sm mt-1">{errors.name}</p>
+                      {errors.username && (
+                        <p className="text-red-400 font-orbitron text-sm mt-1">{errors.username}</p>
                       )}
                     </div>
                   )}
