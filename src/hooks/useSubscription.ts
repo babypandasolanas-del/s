@@ -7,9 +7,18 @@ export const useSubscription = () => {
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>('free');
   const [loading, setLoading] = useState(true);
 
+  // Admin bypass - hardcoded for security
+  const isAdminEmail = user?.email === 'selflevelings@gmail.com';
+
   useEffect(() => {
     if (user) {
-      fetchSubscriptionStatus();
+      if (isAdminEmail) {
+        // Grant immediate admin access
+        setSubscriptionStatus('active');
+        setLoading(false);
+      } else {
+        fetchSubscriptionStatus();
+      }
     } else {
       setSubscriptionStatus('free');
       setLoading(false);
@@ -18,6 +27,11 @@ export const useSubscription = () => {
 
   const fetchSubscriptionStatus = async () => {
     if (!user) return;
+
+    // Admin bypass - skip database query
+    if (isAdminEmail) {
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -46,7 +60,7 @@ export const useSubscription = () => {
     }
   };
 
-  const isActive = subscriptionStatus === 'active';
+  const isActive = subscriptionStatus === 'active' || isAdminEmail;
   const isFree = subscriptionStatus === 'free';
   const isCanceled = subscriptionStatus === 'canceled';
   const isExpired = subscriptionStatus === 'expired';

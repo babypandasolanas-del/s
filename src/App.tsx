@@ -55,6 +55,19 @@ function App() {
   const checkUserData = async () => {
     if (!user) return;
 
+    // Admin bypass - grant immediate access
+    if (user.email === 'selflevelings@gmail.com') {
+      setHunterData({
+        rank: 'SS', // Give admin the highest rank
+        totalScore: 150, // Perfect score
+        streak: 365, // Year-long streak
+        totalXp: 10000, // Maximum XP
+        dailyQuests: []
+      });
+      setCurrentState('dashboard');
+      return;
+    }
+
     try {
       // Check if user has a profile first
       const { data: profileData } = await supabase
