@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Shield, CheckCircle, Check, AlertCircle } from 'lucide-react';
-import { signUp, signIn, verifyOTP, resendOTP, validateEmail, getPasswordValidation, validateName } from '../lib/auth';
+import { signUp, signIn, verifyOTP, resendOTP, validateEmail, getPasswordValidation, validateUsername } from '../lib/auth';
 import GlowingCard from './GlowingCard';
 
 interface AuthModalProps {
