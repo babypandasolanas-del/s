@@ -58,10 +58,10 @@ function App() {
     // Admin bypass - grant immediate access
     if (user.email === 'selflevelings@gmail.com') {
       setHunterData({
-        rank: 'SS', // Give admin the highest rank
-        totalScore: 150, // Perfect score
+        rank: 'D', // Start with D rank like other users
+        totalScore: 150, // Perfect assessment score
         streak: 365, // Year-long streak
-        totalXp: 10000, // Maximum XP
+        totalXp: 800, // Enough XP for D rank
         dailyQuests: []
       });
       setCurrentState('dashboard');

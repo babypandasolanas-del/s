@@ -12,6 +12,7 @@ import {
   Shield
 } from 'lucide-react';
 import { generateDailyQuests } from '../data/questSystem';
+import { getXpRequiredForNextRank, getNextRank } from '../data/questSystem';
 import GlowingCard from '../components/GlowingCard';
 import RankBadge from '../components/RankBadge';
 import ProgressBar from '../components/ProgressBar';
@@ -136,14 +137,76 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                 <h3 className="text-xl font-orbitron font-bold text-white mb-4 text-glow">
                   Hunter Profile
                 </h3>
-                <div className="space-y-4">
-                  <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-4">
-                    <div className="text-electric-blue font-orbitron text-sm mb-1">Assessment Score</div>
-                    <div className="text-2xl font-orbitron font-bold text-white text-glow">{totalScore}/150</div>
+                
+                {/* Current Rank Display */}
+                <div className="mb-4">
+                  <RankBadge rank={rank as any} size="lg" />
+                </div>
+                
+                <div className="space-y-3">
+                  {/* Current Rank */}
+                  <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
+                    <div className="text-electric-blue font-orbitron text-sm mb-1">Current Rank</div>
+                    <div className="text-xl font-orbitron font-bold text-white text-glow">{rank}</div>
                   </div>
-                  <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-4">
+                  
+                  {/* Next Rank */}
+                  {(() => {
+                    const nextRank = getNextRank(rank as any);
+                    return nextRank ? (
+                      <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
+                        <div className="text-electric-blue font-orbitron text-sm mb-1">Next Rank</div>
+                        <div className="text-xl font-orbitron font-bold text-white text-glow">{nextRank}</div>
+                      </div>
+                    ) : (
+                      <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
+                        <div className="text-electric-blue font-orbitron text-sm mb-1">Status</div>
+                        <div className="text-lg font-orbitron font-bold text-white text-glow">MAX RANK</div>
+                      </div>
+                    );
+                  })()}
+                  
+                  {/* XP Progress */}
+                  <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
                     <div className="text-electric-blue font-orbitron text-sm mb-1">Total XP</div>
-                    <div className="text-2xl font-orbitron font-bold text-white text-glow">{totalXp}</div>
+                    <div className="text-xl font-orbitron font-bold text-white text-glow">{totalXp}</div>
+                  </div>
+                  
+                  {/* Rank Progress Bar */}
+                  {(() => {
+                    const nextRank = getNextRank(rank as any);
+                    if (!nextRank) {
+                      return (
+                        <div className="text-center py-2">
+                          <div className="text-electric-blue font-orbitron text-sm text-glow">
+                            🏆 Maximum Rank Achieved
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    const currentRankXp = getXpRequiredForNextRank(rank as any);
+                    const progress = Math.min((totalXp / currentRankXp) * 100, 100);
+                    
+                    return (
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-electric-blue font-orbitron text-sm">Progress to {nextRank}</span>
+                          <span className="text-electric-blue font-orbitron text-sm">{totalXp}/{currentRankXp} XP</span>
+                        </div>
+                        <ProgressBar
+                          current={totalXp}
+                          max={currentRankXp}
+                          showNumbers={false}
+                        />
+                        <div className="text-center mt-1">
+                          <span className="text-electric-blue font-orbitron text-xs">
+                            {Math.round(progress)}% Complete
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   </div>
                 </div>
               </div>
@@ -195,7 +258,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                   Daily Quest Scroll
                 </h3>
                 <div className="text-electric-blue font-orbitron text-lg">
-                  {completedQuests} / {dailyQuests.length} Complete
+                  {completedQuests} / 6 Complete
                 </div>
               </div>
 
@@ -267,7 +330,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                     🎉 Perfect Day Achievement!
                   </h4>
                   <p className="text-white/80 font-orbitron leading-relaxed">
-                    You've completed all daily quests! Your dedication brings you one step closer 
+                    You've completed all 6 daily quests! Your dedication brings you one step closer 
                     to transcending your current rank. Return tomorrow for new challenges.
                   </p>
                 </motion.div>
@@ -283,9 +346,9 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                 </h3>
                 <div className="bg-gradient-to-r from-electric-blue/10 to-electric-blue-dark/10 border border-electric-blue/30 rounded-lg p-6">
                   <div className="text-white/90 font-orbitron text-sm space-y-2 text-left">
-                    <p>⚔️ Complete all 3 missions daily to maintain your streak</p>
+                    <p>⚔️ Complete all 6 core quests daily to maintain your streak</p>
                     <p>📈 Each completed day brings you closer to the next rank</p>
-                    <p>⚠️ Missing 3 consecutive days will result in rank demotion</p>
+                    <p>⚠️ Missing consecutive days will slow your progress</p>
                     <p>🔥 True hunters never give up, no matter how difficult the path</p>
                   </div>
                 </div>
