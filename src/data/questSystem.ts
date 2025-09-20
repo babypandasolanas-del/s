@@ -3,9 +3,9 @@ import { Quest, Category } from '../types';
 export type Rank = 'E' | 'D' | 'C' | 'B' | 'A' | 'S' | 'SS';
 
 export const calculateRankFromScore = (totalScore: number): Rank => {
-  // Maximum assessment score gets D rank, otherwise E rank
-  if (totalScore >= 150) return 'D'; // Perfect score
-  return 'E'; // All other scores
+  // Initial rank assignment based on assessment score
+  if (totalScore >= 150) return 'D'; // Maximum score gets D rank
+  return 'E'; // Below maximum gets E rank
 };
 
 export const getRankDescription = (rank: Rank): string => {
@@ -143,24 +143,25 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
 
 export const getXpRequiredForNextRank = (rank: Rank): number => {
   const requirements = {
-    E: 300,   // E → D
-    D: 750,   // D → C  
-    C: 1500,  // C → B
-    B: 3000,  // B → A
-    A: 6000,  // A → S
-    S: 12000, // S → SS
-    SS: 25000 // SS → Max
+    E: 300,    // E → D requires 300 XP
+    D: 750,    // D → C requires 750 XP total
+    C: 1500,   // C → B requires 1500 XP total
+    B: 3000,   // B → A requires 3000 XP total
+    A: 6000,   // A → S requires 6000 XP total
+    S: 12000,  // S → SS requires 12000 XP total
+    SS: 25000  // SS → Max (no further progression)
   };
   return requirements[rank];
 };
 
 export const calculateRankFromXp = (totalXp: number): Rank => {
-  if (totalXp >= 25000) return 'SS';
-  if (totalXp >= 12000) return 'S';
-  if (totalXp >= 6000) return 'A';
-  if (totalXp >= 3000) return 'B';
-  if (totalXp >= 1500) return 'C';
-  if (totalXp >= 750) return 'D';
+  // XP-based rank progression thresholds
+  if (totalXp >= 12000) return 'SS';
+  if (totalXp >= 6000) return 'S';
+  if (totalXp >= 3000) return 'A';
+  if (totalXp >= 1500) return 'B';
+  if (totalXp >= 750) return 'C';
+  if (totalXp >= 300) return 'D';
   return 'E';
 };
 

@@ -190,25 +190,22 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                     
                     return (
                       <div>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-electric-blue font-orbitron text-sm">Progress to {nextRank}</span>
-                          <span className="text-electric-blue font-orbitron text-sm">{totalXp}/{currentRankXp} XP</span>
+                        <div className="mb-2">
+                          <div className="text-electric-blue font-orbitron text-sm mb-1">Progress to {nextRank}</div>
+                          <div className="text-electric-blue font-orbitron text-sm font-bold">
+                            {totalXp}/{currentRankXp} XP → {Math.round(progress)}% complete
+                          </div>
                         </div>
                         <ProgressBar
                           current={totalXp}
                           max={currentRankXp}
                           showNumbers={false}
                         />
-                        <div className="text-center mt-1">
-                          <span className="text-electric-blue font-orbitron text-xs">
-                            {Math.round(progress)}% Complete
-                          </span>
-                        </div>
                       </div>
                     );
                   })()}
-                  </div>
                 </div>
+              </div>
             </GlowingCard>
 
             {/* Streak Counter */}
