@@ -209,7 +209,6 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                   })()}
                   </div>
                 </div>
-              </div>
             </GlowingCard>
 
             {/* Streak Counter */}
