@@ -58,7 +58,7 @@ function App() {
     // Admin bypass - grant immediate access
     if (user.email === 'selflevelings@gmail.com') {
       setHunterData({
-        rank: 'SS', // Grant maximum rank for testing
+        rank: 'D', // Start admin at D rank (can be reset via admin tools)
         totalScore: 150, // Perfect assessment score
         streak: 365, // Year-long streak
         totalXp: 25000, // Maximum XP for testing

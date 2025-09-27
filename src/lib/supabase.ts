@@ -190,3 +190,30 @@ export const updateSubscription = async (userId: string, updates: any) => {
     .single();
   return { data, error };
 };
+
+// Admin functions
+export const resetUserRank = async (userId: string, newRank: string) => {
+  const { data, error } = await supabase
+    .from('users')
+    .update({ 
+      rank: newRank,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateUserProfile = async (userId: string, updates: any) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+  return { data, error };
+};
