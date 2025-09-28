@@ -35,13 +35,20 @@ interface HunterDashboardProps {
 }
 
 const HunterDashboard: React.FC<HunterDashboardProps> = ({ 
-  rank, 
-  totalScore, 
-  streak, 
-  totalXp,
+  rank: initialRank, 
+  totalScore: initialTotalScore, 
+  streak: initialStreak, 
+  totalXp: initialTotalXp,
   onUpdateProgress 
 }) => {
   const [dailyQuests, setDailyQuests] = useState<any[]>([]);
+  const [userStats, setUserStats] = useState({
+    rank: initialRank,
+    totalXp: initialTotalXp,
+    streak: initialStreak,
+    questsCompleted: 0
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
   const { userName, user } = useAuth();
   const { sendNotification, sendRankUp, scheduleQuestReminder } = useNotifications();
   const [notification, setNotification] = useState<{
@@ -55,9 +62,50 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
   const isAdmin = user?.email === 'selflevelings@gmail.com';
 
   useEffect(() => {
-    setDailyQuests(generateDailyQuests(rank as any));
+    setDailyQuests(generateDailyQuests(userStats.rank as any));
     scheduleQuestReminder();
-  }, [rank]);
+    if (user) {
+      fetchUserStats();
+    }
+  }, [userStats.rank, user]);
+
+  const fetchUserStats = async () => {
+    if (!user) return;
+    
+    setIsLoadingStats(true);
+    try {
+      // Fetch user profile data
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // Fetch today's quests to count completed ones
+      const today = new Date().toISOString().split('T')[0];
+      const { data: questsData } = await supabase
+        .from('quests')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('quest_date', today);
+
+      if (profileData) {
+        const completedQuests = questsData?.filter(q => q.completed).length || 0;
+        const currentRank = calculateRankFromXp(profileData.total_xp || initialTotalXp);
+        
+        setUserStats({
+          rank: currentRank,
+          totalXp: profileData.total_xp || initialTotalXp,
+          streak: profileData.streak_days || initialStreak,
+          questsCompleted: completedQuests
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
 
   const showNotification = (message: string, type: 'success' | 'warning' | 'achievement') => {
     setNotification({ show: true, message, type });
