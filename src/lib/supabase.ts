@@ -205,7 +205,7 @@ export const resetUserRank = async (userId: string, newRank: string) => {
   return { data, error };
 };
 
-export const updateUserProfile = async (userId: string, updates: any) => {
+export const updateUserProfileAdmin = async (userId: string, updates: any) => {
   const { data, error } = await supabase
     .from('profiles')
     .update({
