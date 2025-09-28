@@ -194,10 +194,11 @@ export const updateSubscription = async (userId: string, updates: any) => {
 // Admin functions
 export const resetUserRank = async (userId: string, newRank: string) => {
   const { data, error } = await supabase
-    .from('users')
+    .from('profiles')
     .update({ 
       rank: newRank,
-      updated_at: new Date().toISOString()
+      total_xp: newRank === 'D' ? 300 : 0, // Set appropriate XP for rank
+      streak_days: 0 // Reset streak when rank is reset
     })
     .eq('id', userId)
     .select()

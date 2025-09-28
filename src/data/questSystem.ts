@@ -165,6 +165,19 @@ export const calculateRankFromXp = (totalXp: number): Rank => {
   return 'E';
 };
 
+export const getXpRequiredForCurrentRank = (rank: Rank): number => {
+  const requirements = {
+    E: 0,      // E rank starts at 0 XP
+    D: 300,    // D rank starts at 300 XP
+    C: 750,    // C rank starts at 750 XP
+    B: 1500,   // B rank starts at 1500 XP
+    A: 3000,   // A rank starts at 3000 XP
+    S: 6000,   // S rank starts at 6000 XP
+    SS: 12000  // SS rank starts at 12000 XP
+  };
+  return requirements[rank];
+};
+
 export const getNextRank = (currentRank: Rank): Rank | null => {
   const rankOrder: Rank[] = ['E', 'D', 'C', 'B', 'A', 'S', 'SS'];
   const currentIndex = rankOrder.indexOf(currentRank);

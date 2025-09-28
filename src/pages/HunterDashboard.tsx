@@ -403,7 +403,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                   Daily Quest Scroll
                 </h3>
                 <div className="text-electric-blue font-orbitron text-lg">
-                  {completedQuests} / 6 Complete
+                  {userStats.questsCompleted} / 6 Complete
                 </div>
               </div>
 
