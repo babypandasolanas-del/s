@@ -14,7 +14,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { generateDailyQuests } from '../data/questSystem';
-import { getXpRequiredForNextRank, getNextRank } from '../data/questSystem';
+import { getXpRequiredForNextRank, getNextRank, calculateRankFromXp } from '../data/questSystem';
 import GlowingCard from '../components/GlowingCard';
 import RankBadge from '../components/RankBadge';
 import ProgressBar from '../components/ProgressBar';
