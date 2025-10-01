@@ -285,7 +285,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
             ⚔️ HUNTER SYSTEM
           </h1>
           <div className="flex items-center justify-center gap-4">
-            <RankBadge rank={rank as any} size="lg" />
+            <RankBadge rank={userStats.rank as any} size="lg" />
             <motion.p 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -352,19 +352,19 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                 
                 {/* Current Rank Display */}
                 <div className="mb-4">
-                  <RankBadge rank={rank as any} size="lg" />
+                  <RankBadge rank={userStats.rank as any} size="lg" />
                 </div>
                 
                 <div className="space-y-3">
                   {/* Current Rank */}
                   <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
                     <div className="text-electric-blue font-orbitron text-sm mb-1">Current Rank</div>
-                    <div className="text-xl font-orbitron font-bold text-white text-glow">{rank}</div>
+                    <div className="text-xl font-orbitron font-bold text-white text-glow">{userStats.rank}</div>
                   </div>
                   
                   {/* Next Rank */}
                   {(() => {
-                    const nextRank = getNextRank(rank as any);
+                    const nextRank = getNextRank(userStats.rank as any);
                     return nextRank ? (
                       <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
                         <div className="text-electric-blue font-orbitron text-sm mb-1">Next Rank</div>
@@ -381,12 +381,12 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                   {/* XP Progress */}
                   <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
                     <div className="text-electric-blue font-orbitron text-sm mb-1">Total XP</div>
-                    <div className="text-xl font-orbitron font-bold text-white text-glow">{totalXp}</div>
+                    <div className="text-xl font-orbitron font-bold text-white text-glow">{userStats.totalXp}</div>
                   </div>
                   
                   {/* Rank Progress Bar */}
                   {(() => {
-                    const nextRank = getNextRank(rank as any);
+                    const nextRank = getNextRank(userStats.rank as any);
                     if (!nextRank) {
                       return (
                         <div className="text-center py-2">
@@ -397,19 +397,19 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                       );
                     }
                     
-                    const currentRankXp = getXpRequiredForNextRank(rank as any);
-                    const progress = Math.min((totalXp / currentRankXp) * 100, 100);
+                    const currentRankXp = getXpRequiredForNextRank(userStats.rank as any);
+                    const progress = Math.min((userStats.totalXp / currentRankXp) * 100, 100);
                     
                     return (
                       <div>
                         <div className="mb-2">
                           <div className="text-electric-blue font-orbitron text-sm mb-1">Progress to {nextRank}</div>
                           <div className="text-electric-blue font-orbitron text-sm font-bold">
-                            {totalXp}/{currentRankXp} XP → {Math.round(progress)}% complete
+                            {userStats.totalXp}/{currentRankXp} XP → {Math.round(progress)}% complete
                           </div>
                         </div>
                         <ProgressBar
-                          current={totalXp}
+                          current={userStats.totalXp}
                           max={currentRankXp}
                           showNumbers={false}
                         />
@@ -425,7 +425,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
               <GlowingCard hover={false}>
                 <div className="text-center">
                   <Flame className="w-8 h-8 text-electric-blue mx-auto mb-2" />
-                  <div className="text-2xl font-orbitron font-bold text-white text-glow">{streak}</div>
+                  <div className="text-2xl font-orbitron font-bold text-white text-glow">{userStats.streak}</div>
                   <div className="text-electric-blue font-orbitron text-sm">Day Streak</div>
                 </div>
               </GlowingCard>
@@ -450,7 +450,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                 </p>
               </div>
               <ProgressBar
-                current={streak}
+                current={userStats.streak}
                 max={30}
                 label="Days to Next Rank"
               />
