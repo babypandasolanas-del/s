@@ -126,25 +126,88 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
     });
   };
 
-  const completeQuest = (questId: string) => {
-    setDailyQuests(quests => 
-      quests.map(quest => {
-        if (quest.id === questId && !quest.completed) {
-          const newXp = totalXp + quest.xpReward;
-          const newStreak = streak + (quests.filter(q => q.completed).length === 2 ? 1 : 0); // Increment streak when all quests done
-          
-          showNotification(
-            `⚔️ Quest Complete! You gained +${quest.xpReward} XP`, 
-            'success'
-          );
-          
-          onUpdateProgress(newXp, newStreak);
-          
-          return { ...quest, completed: true };
-        }
-        return quest;
-      })
-    );
+  const completeQuest = async (questId: string) => {
+    if (!user) return;
+    
+    const quest = dailyQuests.find(q => q.id === questId);
+    if (!quest || quest.completed) return;
+
+    try {
+      // Calculate new values based on current userStats
+      const newTotalXp = userStats.totalXp + quest.xpReward;
+      const newRank = calculateRankFromXp(newTotalXp);
+      const rankChanged = newRank !== userStats.rank;
+      
+      // Check if all quests will be completed after this one
+      const completedCount = dailyQuests.filter(q => q.completed).length;
+      const newStreak = completedCount === dailyQuests.length - 1 ? userStats.streak + 1 : userStats.streak;
+
+      // Update quest in database
+      const { error: questError } = await supabase
+        .from('quests')
+        .upsert({
+          id: questId,
+          user_id: user.id,
+          quest_date: new Date().toISOString().split('T')[0],
+          quest_type: quest.category,
+          title: quest.title,
+          description: quest.description,
+          xp_reward: quest.xpReward,
+          completed: true,
+          completed_at: new Date().toISOString()
+        });
+
+      if (questError) throw questError;
+
+      // Update user profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          total_xp: newTotalXp,
+          streak_days: newStreak,
+          rank: newRank,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
+
+      // Update local state
+      setUserStats(prev => ({
+        ...prev,
+        totalXp: newTotalXp,
+        streak: newStreak,
+        rank: newRank,
+        questsCompleted: prev.questsCompleted + 1
+      }));
+
+      setDailyQuests(quests => 
+        quests.map(q => 
+          q.id === questId ? { ...q, completed: true } : q
+        )
+      );
+
+      // Show notifications
+      showNotification(
+        `⚔️ Quest Complete! You gained +${quest.xpReward} XP`, 
+        'success'
+      );
+
+      if (rankChanged) {
+        showNotification(
+          `🎉 Rank Up! You are now ${newRank} rank!`,
+          'achievement'
+        );
+        sendRankUp(newRank);
+      }
+
+      // Update parent component
+      onUpdateProgress(newTotalXp, newStreak);
+
+    } catch (error: any) {
+      console.error('Error completing quest:', error);
+      toast.error('Failed to complete quest. Please try again.');
+    }
   };
 
   const completedQuests = dailyQuests.filter(q => q.completed).length;
