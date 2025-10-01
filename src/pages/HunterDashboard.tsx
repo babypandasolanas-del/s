@@ -14,14 +14,15 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { generateDailyQuests } from '../data/questSystem';
-import { getXpRequiredForNextRank, getNextRank, calculateRankFromXp } from '../data/questSystem';
+import { getRankConfig, getNextRankId } from '../lib/rankConfig';
 import GlowingCard from '../components/GlowingCard';
 import RankBadge from '../components/RankBadge';
-import ProgressBar from '../components/ProgressBar';
+import DynamicProgressBar from '../components/DynamicProgressBar';
 import SystemNotification from '../components/SystemNotification';
 import NotificationSetup from '../components/NotificationSetup';
 import DiscordButton from '../components/DiscordButton';
 import { useNotifications } from '../hooks/useNotifications';
+import { useUserProgress } from '../hooks/useUserProgress';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
@@ -42,14 +43,8 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
   onUpdateProgress 
 }) => {
   const [dailyQuests, setDailyQuests] = useState<any[]>([]);
-  const [userStats, setUserStats] = useState({
-    rank: initialRank,
-    totalXp: initialTotalXp,
-    streak: initialStreak,
-    questsCompleted: 0
-  });
-  const [isLoadingStats, setIsLoadingStats] = useState(false);
   const { userName, user } = useAuth();
+  const { progressData, loading: progressLoading, updateProgress, refetch } = useUserProgress();
   const { sendNotification, sendRankUp, scheduleQuestReminder } = useNotifications();
   const [notification, setNotification] = useState<{
     show: boolean;
@@ -62,50 +57,11 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
   const isAdmin = user?.email === 'selflevelings@gmail.com';
 
   useEffect(() => {
-    setDailyQuests(generateDailyQuests(userStats.rank as any));
+    if (progressData) {
+      setDailyQuests(generateDailyQuests(progressData.currentRank as any));
+    }
     scheduleQuestReminder();
-    if (user) {
-      fetchUserStats();
-    }
-  }, [userStats.rank, user]);
-
-  const fetchUserStats = async () => {
-    if (!user) return;
-    
-    setIsLoadingStats(true);
-    try {
-      // Fetch user profile data
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      // Fetch today's quests to count completed ones
-      const today = new Date().toISOString().split('T')[0];
-      const { data: questsData } = await supabase
-        .from('quests')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('quest_date', today);
-
-      if (profileData) {
-        const completedQuests = questsData?.filter(q => q.completed).length || 0;
-        const currentRank = calculateRankFromXp(profileData.total_xp || initialTotalXp);
-        
-        setUserStats({
-          rank: currentRank,
-          totalXp: profileData.total_xp || initialTotalXp,
-          streak: profileData.streak_days || initialStreak,
-          questsCompleted: completedQuests
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching user stats:', error);
-    } finally {
-      setIsLoadingStats(false);
-    }
-  };
+  }, [progressData]);
 
   const showNotification = (message: string, type: 'success' | 'warning' | 'achievement') => {
     setNotification({ show: true, message, type });
@@ -127,20 +83,15 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
   };
 
   const completeQuest = async (questId: string) => {
-    if (!user) return;
+    if (!user || !progressData) return;
     
     const quest = dailyQuests.find(q => q.id === questId);
     if (!quest || quest.completed) return;
 
     try {
-      // Calculate new values based on current userStats
-      const newTotalXp = userStats.totalXp + quest.xpReward;
-      const newRank = calculateRankFromXp(newTotalXp);
-      const rankChanged = newRank !== userStats.rank;
-      
       // Check if all quests will be completed after this one
       const completedCount = dailyQuests.filter(q => q.completed).length;
-      const newStreak = completedCount === dailyQuests.length - 1 ? userStats.streak + 1 : userStats.streak;
+      const shouldIncrementStreak = completedCount === dailyQuests.length - 1;
 
       // Update quest in database
       const { error: questError } = await supabase
@@ -159,27 +110,12 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
 
       if (questError) throw questError;
 
-      // Update user profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          total_xp: newTotalXp,
-          streak_days: newStreak,
-          rank: newRank,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (profileError) throw profileError;
-
-      // Update local state
-      setUserStats(prev => ({
-        ...prev,
-        totalXp: newTotalXp,
-        streak: newStreak,
-        rank: newRank,
-        questsCompleted: prev.questsCompleted + 1
-      }));
+      // Update progress using the hook
+      const result = await updateProgress({
+        xpGained: quest.xpReward,
+        questCompleted: true,
+        streakIncrement: shouldIncrementStreak ? 1 : 0
+      });
 
       setDailyQuests(quests => 
         quests.map(q => 
@@ -193,16 +129,18 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
         'success'
       );
 
-      if (rankChanged) {
+      if (result?.rankChanged) {
         showNotification(
-          `🎉 Rank Up! You are now ${newRank} rank!`,
+          `🎉 Rank Up! You are now ${result.newRank} rank!`,
           'achievement'
         );
-        sendRankUp(newRank);
+        sendRankUp(result.newRank);
       }
 
       // Update parent component
-      onUpdateProgress(newTotalXp, newStreak);
+      if (progressData) {
+        onUpdateProgress(progressData.totalXp + quest.xpReward, progressData.streakDays + (shouldIncrementStreak ? 1 : 0));
+      }
 
     } catch (error: any) {
       console.error('Error completing quest:', error);
@@ -219,20 +157,24 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
     setIsResettingRank(true);
     
     try {
-      // For admin, we'll simulate rank reset by updating the local state
-      // Since the app uses hardcoded admin data, we'll just show the effect
-      
-      // In a real implementation, you would update the database:
-      // const { error } = await supabase
-      //   .from('users')
-      //   .update({ rank: 'D' })
-      //   .eq('id', user.id);
+      // Reset admin rank to D with appropriate XP
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          current_rank: 'D',
+          total_xp: 250, // Minimum XP for D rank
+          rank_assigned_at: new Date().toISOString(),
+          streak_days: 0,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
 
-      // For now, we'll just show success and reload
-      console.log('Admin rank reset requested - would update rank to D in database');
+      if (error) throw error;
 
+      // Refresh progress data
+      await refetch();
       // Show success notification
-      toast.success('Rank reset to D successfully! Refresh to see changes.', {
+      toast.success('Rank reset to D successfully!', {
         duration: 4000,
         style: {
           background: 'rgba(10, 15, 28, 0.95)',
@@ -243,13 +185,6 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
           fontFamily: 'Orbitron, sans-serif',
         },
       });
-
-      // Optionally reload the page to reflect changes
-      setTimeout(() => {
-        // For demo purposes, we'll just show the notification
-        // In production, this would reload to fetch updated data
-        console.log('Would reload page to show rank D');
-      }, 2000);
 
     } catch (error: any) {
       console.error('Error resetting rank:', error);
@@ -359,63 +294,49 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                   {/* Current Rank */}
                   <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
                     <div className="text-electric-blue font-orbitron text-sm mb-1">Current Rank</div>
-                    <div className="text-xl font-orbitron font-bold text-white text-glow">{userStats.rank}</div>
+                    <div className="text-xl font-orbitron font-bold text-white text-glow">{progressData.currentRank}</div>
                   </div>
                   
                   {/* Next Rank */}
-                  {(() => {
-                    const nextRank = getNextRank(userStats.rank as any);
-                    return nextRank ? (
-                      <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
-                        <div className="text-electric-blue font-orbitron text-sm mb-1">Next Rank</div>
-                        <div className="text-xl font-orbitron font-bold text-white text-glow">{nextRank}</div>
-                      </div>
-                    ) : (
-                      <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
-                        <div className="text-electric-blue font-orbitron text-sm mb-1">Status</div>
-                        <div className="text-lg font-orbitron font-bold text-white text-glow">MAX RANK</div>
-                      </div>
-                    );
-                  })()}
+                  {progressData.nextRank ? (
+                    <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
+                      <div className="text-electric-blue font-orbitron text-sm mb-1">Next Rank</div>
+                      <div className="text-xl font-orbitron font-bold text-white text-glow">{progressData.nextRank}</div>
+                    </div>
+                  ) : (
+                    <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
+                      <div className="text-electric-blue font-orbitron text-sm mb-1">Status</div>
+                      <div className="text-lg font-orbitron font-bold text-white text-glow">MAX RANK</div>
+                    </div>
+                  )}
                   
                   {/* XP Progress */}
                   <div className="bg-navy-dark/50 border border-electric-blue/30 rounded-lg p-3">
                     <div className="text-electric-blue font-orbitron text-sm mb-1">Total XP</div>
-                    <div className="text-xl font-orbitron font-bold text-white text-glow">{userStats.totalXp}</div>
+                    <div className="text-xl font-orbitron font-bold text-white text-glow">{progressData.totalXp}</div>
                   </div>
                   
                   {/* Rank Progress Bar */}
-                  {(() => {
-                    const nextRank = getNextRank(userStats.rank as any);
-                    if (!nextRank) {
-                      return (
-                        <div className="text-center py-2">
-                          <div className="text-electric-blue font-orbitron text-sm text-glow">
-                            🏆 Maximum Rank Achieved
-                          </div>
-                        </div>
-                      );
-                    }
-                    
-                    const currentRankXp = getXpRequiredForNextRank(userStats.rank as any);
-                    const progress = Math.min((userStats.totalXp / currentRankXp) * 100, 100);
-                    
-                    return (
-                      <div>
-                        <div className="mb-2">
-                          <div className="text-electric-blue font-orbitron text-sm mb-1">Progress to {nextRank}</div>
-                          <div className="text-electric-blue font-orbitron text-sm font-bold">
-                            {userStats.totalXp}/{currentRankXp} XP → {Math.round(progress)}% complete
-                          </div>
-                        </div>
-                        <ProgressBar
-                          current={userStats.totalXp}
-                          max={currentRankXp}
-                          showNumbers={false}
-                        />
+                  {!progressData.isMaxRank ? (
+                    <div>
+                      <div className="mb-2">
+                        <div className="text-electric-blue font-orbitron text-sm mb-1">XP Progress to {progressData.nextRank}</div>
                       </div>
-                    );
-                  })()}
+                      <DynamicProgressBar
+                        current={progressData.xpProgress.current}
+                        max={progressData.xpProgress.max}
+                        percentage={progressData.xpProgress.percentage}
+                        label=""
+                        showNumbers={true}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-2">
+                      <div className="text-electric-blue font-orbitron text-sm text-glow">
+                        🏆 Maximum Rank Achieved
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </GlowingCard>
@@ -425,7 +346,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
               <GlowingCard hover={false}>
                 <div className="text-center">
                   <Flame className="w-8 h-8 text-electric-blue mx-auto mb-2" />
-                  <div className="text-2xl font-orbitron font-bold text-white text-glow">{userStats.streak}</div>
+                  <div className="text-2xl font-orbitron font-bold text-white text-glow">{progressData.streakDays}</div>
                   <div className="text-electric-blue font-orbitron text-sm">Day Streak</div>
                 </div>
               </GlowingCard>
@@ -433,7 +354,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
               <GlowingCard hover={false}>
                 <div className="text-center">
                   <Award className="w-8 h-8 text-electric-blue mx-auto mb-2" />
-                  <div className="text-2xl font-orbitron font-bold text-white text-glow">{completedQuests}</div>
+                  <div className="text-2xl font-orbitron font-bold text-white text-glow">{progressData.questsDone}</div>
                   <div className="text-electric-blue font-orbitron text-sm">Quests Done</div>
                 </div>
               </GlowingCard>
@@ -442,18 +363,30 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
             {/* Rank Progress */}
             <GlowingCard>
               <h3 className="text-lg font-orbitron font-bold text-white mb-4 text-glow">
-                Rank Progress
+                Days Progress to Next Rank
               </h3>
-              <div className="text-center mb-4">
-                <p className="text-electric-blue font-orbitron text-sm">
-                  Complete daily quests to advance your rank
-                </p>
-              </div>
-              <ProgressBar
-                current={userStats.streak}
-                max={30}
-                label="Days to Next Rank"
-              />
+              {!progressData.isMaxRank ? (
+                <div>
+                  <div className="text-center mb-4">
+                    <p className="text-electric-blue font-orbitron text-sm">
+                      {progressData.daysProgress.daysRemaining} days remaining to reach {progressData.nextRank} rank
+                    </p>
+                  </div>
+                  <DynamicProgressBar
+                    current={progressData.daysProgress.daysCompleted}
+                    max={progressData.daysProgress.daysRequired}
+                    percentage={progressData.daysProgress.percentage}
+                    label={`Days Progress (${progressData.daysProgress.daysCompleted}/${progressData.daysProgress.daysRequired})`}
+                    showNumbers={false}
+                  />
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="text-electric-blue font-orbitron text-sm text-glow">
+                    🏆 Maximum Rank Achieved - Continue your legendary journey!
+                  </p>
+                </div>
+              )}
             </GlowingCard>
           </div>
 
@@ -466,7 +399,7 @@ const HunterDashboard: React.FC<HunterDashboardProps> = ({
                   Daily Quest Scroll
                 </h3>
                 <div className="text-electric-blue font-orbitron text-lg">
-                  {userStats.questsCompleted} / 6 Complete
+                  {completedQuests} / 6 Complete
                 </div>
               </div>
 
