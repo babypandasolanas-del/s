@@ -4,7 +4,6 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineIndicator from './components/OfflineIndicator';
 import AuthGuard from './components/AuthGuard';
@@ -18,6 +17,7 @@ import HunterDashboard from './pages/HunterDashboard';
 import { useAuth } from './hooks/useAuth';
 import { useSubscription } from './hooks/useSubscription';
 import { signOut } from './lib/auth';
+import { supabase } from './lib/supabase';
 import { 
   createUserProfile, 
   createUserStats, 
@@ -25,11 +25,6 @@ import {
   getUserProfile,
   getUserQuests 
 } from './lib/supabase';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 type AppState = 'landing' | 'test' | 'locked-reveal' | 'reveal' | 'dashboard' | 'upgrade';
 
