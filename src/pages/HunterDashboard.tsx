@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { supabase } from '../lib/supabase';
@@ -14,7 +15,12 @@ import {
   Users, 
   Calendar,
   Flame,
-  Star
+  Star,
+  Zap,
+  Crown,
+  Plus,
+  TrendingUp,
+  Award
 } from 'lucide-react';
 
 interface Quest {
@@ -30,7 +36,7 @@ interface Quest {
 
 export default function HunterDashboard() {
   const { user } = useAuth();
-  const { userStats, userProfile, loading } = useUserProgress();
+  const { progressData, loading } = useUserProgress();
   const [quests, setQuests] = useState<Quest[]>([]);
   const [loadingQuests, setLoadingQuests] = useState(true);
 
@@ -80,8 +86,15 @@ export default function HunterDashboard() {
 
   if (loading || loadingQuests) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading Hunter Dashboard...</div>
+      <div className="min-h-screen bg-[#0d0d1a] flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-12 h-12 border-4 border-electric-blue/30 border-t-electric-blue rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white font-orbitron text-glow">Loading Hunter System...</p>
+        </motion.div>
       </div>
     );
   }
@@ -90,167 +103,298 @@ export default function HunterDashboard() {
   const totalQuests = quests.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#0d0d1a] text-white">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl md:text-5xl font-orbitron font-bold text-white mb-4 text-glow-strong">
             Hunter Dashboard
           </h1>
-          <p className="text-purple-200">
-            Welcome back, {userProfile?.name || 'Hunter'}
+          <p className="text-electric-blue font-orbitron text-lg text-glow">
+            Welcome back, Hunter {user?.email?.split('@')[0] || 'Unknown'}
           </p>
-        </div>
+          
+          {/* Glowing separator */}
+          <motion.div
+            className="w-32 h-1 mx-auto mt-6 rounded-full bg-gradient-to-r from-transparent via-electric-blue to-transparent"
+            style={{
+              boxShadow: '0 0 20px #00f0ff, 0 0 40px #00f0ff'
+            }}
+            animate={{
+              opacity: [0.5, 1, 0.5],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </motion.div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <GlowingCard className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-200 text-sm">Current Rank</p>
-                <div className="mt-2">
-                  <RankBadge rank={userProfile?.rank || 'E'} size="lg" />
-                </div>
+        {/* Stats Overview - Top Row */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+        >
+          {/* Current Rank */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="bg-[#0d0d1a]/90 border border-electric-blue/30 rounded-xl p-6 backdrop-blur-sm
+                     hover:border-electric-blue/60 transition-all duration-300"
+            style={{
+              boxShadow: '0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05)'
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <Trophy className="w-8 h-8 text-electric-blue" />
+              <div className="text-right">
+                <p className="text-electric-blue/60 text-sm font-orbitron">Current Rank</p>
               </div>
-              <Trophy className="w-8 h-8 text-yellow-400" />
             </div>
-          </GlowingCard>
+            <div className="flex justify-center">
+              <RankBadge rank={progressData?.currentRank || 'E'} size="lg" />
+            </div>
+          </motion.div>
 
-          <GlowingCard className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-200 text-sm">Total XP</p>
-                <p className="text-2xl font-bold text-white">
-                  {userProfile?.total_xp?.toLocaleString() || 0}
-                </p>
+          {/* Total XP */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="bg-[#0d0d1a]/90 border border-electric-blue/30 rounded-xl p-6 backdrop-blur-sm
+                     hover:border-electric-blue/60 transition-all duration-300"
+            style={{
+              boxShadow: '0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05)'
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <Star className="w-8 h-8 text-electric-blue" />
+              <div className="text-right">
+                <p className="text-electric-blue/60 text-sm font-orbitron">Total XP</p>
               </div>
-              <Star className="w-8 h-8 text-blue-400" />
             </div>
-          </GlowingCard>
+            <p className="text-2xl font-orbitron font-bold text-white text-glow text-center">
+              {progressData?.totalXp?.toLocaleString() || 0}
+            </p>
+          </motion.div>
 
-          <GlowingCard className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-200 text-sm">Streak</p>
-                <p className="text-2xl font-bold text-white">
-                  {userProfile?.streak_days || 0} days
-                </p>
+          {/* Streak */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="bg-[#0d0d1a]/90 border border-electric-blue/30 rounded-xl p-6 backdrop-blur-sm
+                     hover:border-electric-blue/60 transition-all duration-300"
+            style={{
+              boxShadow: '0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05)'
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <Flame className="w-8 h-8 text-electric-blue" />
+              <div className="text-right">
+                <p className="text-electric-blue/60 text-sm font-orbitron">Streak</p>
               </div>
-              <Flame className="w-8 h-8 text-orange-400" />
             </div>
-          </GlowingCard>
+            <p className="text-2xl font-orbitron font-bold text-white text-glow text-center">
+              {progressData?.streakDays || 0} days
+            </p>
+          </motion.div>
 
-          <GlowingCard className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-200 text-sm">Today's Progress</p>
-                <p className="text-2xl font-bold text-white">
-                  {completedQuests}/{totalQuests}
-                </p>
+          {/* Today's Progress */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="bg-[#0d0d1a]/90 border border-electric-blue/30 rounded-xl p-6 backdrop-blur-sm
+                     hover:border-electric-blue/60 transition-all duration-300"
+            style={{
+              boxShadow: '0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05)'
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <Target className="w-8 h-8 text-electric-blue" />
+              <div className="text-right">
+                <p className="text-electric-blue/60 text-sm font-orbitron">Today's Progress</p>
               </div>
-              <Target className="w-8 h-8 text-green-400" />
             </div>
-          </GlowingCard>
-        </div>
+            <p className="text-2xl font-orbitron font-bold text-white text-glow text-center">
+              {completedQuests}/{totalQuests}
+            </p>
+          </motion.div>
+        </motion.div>
 
         {/* Stats Carousel */}
-        <div className="mb-8">
-          <StatsCarousel stats={userStats} />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-12"
+        >
+          <h2 className="text-2xl font-orbitron font-bold text-white mb-6 text-center text-glow">
+            Hunter Stats
+          </h2>
+          <StatsCarousel />
+        </motion.div>
 
-        {/* Today's Quests */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <GlowingCard className="p-6">
-            <div className="flex items-center mb-4">
-              <Sword className="w-6 h-6 text-purple-400 mr-2" />
-              <h2 className="text-xl font-bold text-white">Today's Quests</h2>
+        {/* Glowing separator */}
+        <motion.div
+          className="w-full h-px bg-gradient-to-r from-transparent via-electric-blue/30 to-transparent mb-12"
+          style={{
+            boxShadow: '0 0 10px rgba(0, 240, 255, 0.3)'
+          }}
+        />
+
+        {/* Main Content - Quests and Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+        >
+          {/* Today's Quests */}
+          <div className="bg-[#0d0d1a]/90 border border-electric-blue/30 rounded-xl p-6 backdrop-blur-sm"
+               style={{
+                 boxShadow: '0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05)'
+               }}>
+            <div className="flex items-center mb-6">
+              <Sword className="w-6 h-6 text-electric-blue mr-3" />
+              <h2 className="text-xl font-orbitron font-bold text-white text-glow">Today's Quests</h2>
             </div>
             
             {quests.length === 0 ? (
-              <p className="text-purple-200">No quests for today. Create some to start your journey!</p>
+              <div className="text-center py-8">
+                <Calendar className="w-12 h-12 text-electric-blue/50 mx-auto mb-4" />
+                <p className="text-electric-blue/60 font-orbitron">No quests for today</p>
+                <p className="text-white/60 font-orbitron text-sm mt-2">Create some to start your journey!</p>
+              </div>
             ) : (
-              <div className="space-y-3">
-                {quests.map((quest) => (
-                  <div
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {quests.map((quest, index) => (
+                  <motion.div
                     key={quest.id}
-                    className={`p-4 rounded-lg border transition-all ${
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`p-4 rounded-lg border transition-all duration-300 ${
                       quest.completed
-                        ? 'bg-green-900/20 border-green-500/30'
-                        : 'bg-slate-800/50 border-slate-600/30 hover:border-purple-500/50'
+                        ? 'bg-electric-blue/10 border-electric-blue/50'
+                        : 'bg-[#0d0d1a]/50 border-electric-blue/20 hover:border-electric-blue/40'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <h3 className={`font-semibold ${
-                          quest.completed ? 'text-green-300 line-through' : 'text-white'
+                        <h3 className={`font-orbitron font-semibold mb-2 ${
+                          quest.completed ? 'text-electric-blue line-through' : 'text-white text-glow'
                         }`}>
                           {quest.title}
                         </h3>
-                        <p className="text-sm text-purple-200 mt-1">
+                        <p className="text-white/70 font-orbitron text-sm mb-3">
                           {quest.description}
                         </p>
-                        <div className="flex items-center mt-2 space-x-2">
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            quest.category === 'mind' ? 'bg-blue-900/50 text-blue-300' :
-                            quest.category === 'body' ? 'bg-red-900/50 text-red-300' :
-                            quest.category === 'discipline' ? 'bg-purple-900/50 text-purple-300' :
-                            quest.category === 'lifestyle' ? 'bg-green-900/50 text-green-300' :
-                            quest.category === 'willpower' ? 'bg-orange-900/50 text-orange-300' :
-                            'bg-yellow-900/50 text-yellow-300'
-                          }`}>
+                        <div className="flex items-center space-x-3">
+                          <span className="px-3 py-1 rounded-full text-xs font-orbitron bg-electric-blue/20 text-electric-blue border border-electric-blue/30">
                             {quest.category}
                           </span>
-                          <span className="text-xs text-purple-200">
-                            {quest.xp_reward} XP
+                          <span className="text-xs text-electric-blue font-orbitron font-semibold">
+                            +{quest.xp_reward} XP
                           </span>
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            quest.difficulty === 'easy' ? 'bg-green-900/50 text-green-300' :
-                            quest.difficulty === 'medium' ? 'bg-yellow-900/50 text-yellow-300' :
-                            'bg-red-900/50 text-red-300'
+                          <span className={`text-xs px-2 py-1 rounded-full font-orbitron ${
+                            quest.difficulty === 'easy' ? 'bg-electric-blue/20 text-electric-blue' :
+                            quest.difficulty === 'medium' ? 'bg-electric-blue/30 text-electric-blue' :
+                            'bg-electric-blue/40 text-white'
                           }`}>
                             {quest.difficulty}
                           </span>
                         </div>
                       </div>
                       {!quest.completed && (
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => completeQuest(quest.id)}
-                          className="ml-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                          className="ml-4 px-4 py-2 bg-gradient-to-r from-electric-blue to-cyan-400 
+                                   text-white font-orbitron font-medium rounded-lg transition-all duration-300
+                                   hover:shadow-lg hover:shadow-electric-blue/25"
                         >
                           Complete
-                        </button>
+                        </motion.button>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}
-          </GlowingCard>
+          </div>
 
           {/* Quick Actions */}
-          <GlowingCard className="p-6">
-            <div className="flex items-center mb-4">
-              <Shield className="w-6 h-6 text-purple-400 mr-2" />
-              <h2 className="text-xl font-bold text-white">Quick Actions</h2>
+          <div className="bg-[#0d0d1a]/90 border border-electric-blue/30 rounded-xl p-6 backdrop-blur-sm"
+               style={{
+                 boxShadow: '0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05)'
+               }}>
+            <div className="flex items-center mb-6">
+              <Shield className="w-6 h-6 text-electric-blue mr-3" />
+              <h2 className="text-xl font-orbitron font-bold text-white text-glow">Quick Actions</h2>
             </div>
             
-            <div className="space-y-3">
-              <button className="w-full p-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all transform hover:scale-105">
+            <div className="space-y-4">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full p-4 bg-gradient-to-r from-electric-blue to-cyan-400 
+                         text-white font-orbitron font-medium rounded-lg transition-all duration-300
+                         hover:shadow-lg hover:shadow-electric-blue/25 flex items-center justify-center gap-3"
+              >
+                <Plus className="w-5 h-5" />
                 Create New Quest
-              </button>
-              <button className="w-full p-4 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white rounded-lg transition-all transform hover:scale-105">
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full p-4 bg-gradient-to-r from-electric-blue to-cyan-400 
+                         text-white font-orbitron font-medium rounded-lg transition-all duration-300
+                         hover:shadow-lg hover:shadow-electric-blue/25 flex items-center justify-center gap-3"
+              >
+                <TrendingUp className="w-5 h-5" />
                 View Progress
-              </button>
-              <button className="w-full p-4 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white rounded-lg transition-all transform hover:scale-105">
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full p-4 bg-gradient-to-r from-electric-blue to-cyan-400 
+                         text-white font-orbitron font-medium rounded-lg transition-all duration-300
+                         hover:shadow-lg hover:shadow-electric-blue/25 flex items-center justify-center gap-3"
+              >
+                <Crown className="w-5 h-5" />
                 Boss Missions
-              </button>
-              <button className="w-full p-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all transform hover:scale-105 flex items-center justify-center">
-                <Users className="w-5 h-5 mr-2" />
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full p-4 bg-gradient-to-r from-electric-blue to-cyan-400 
+                         text-white font-orbitron font-medium rounded-lg transition-all duration-300
+                         hover:shadow-lg hover:shadow-electric-blue/25 flex items-center justify-center gap-3"
+              >
+                <Users className="w-5 h-5" />
                 Join Guild
-              </button>
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full p-4 bg-gradient-to-r from-electric-blue to-cyan-400 
+                         text-white font-orbitron font-medium rounded-lg transition-all duration-300
+                         hover:shadow-lg hover:shadow-electric-blue/25 flex items-center justify-center gap-3"
+              >
+                <Award className="w-5 h-5" />
+                Achievements
+              </motion.button>
             </div>
-          </GlowingCard>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
