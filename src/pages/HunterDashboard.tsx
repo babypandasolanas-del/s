@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { supabase } from '../lib/supabase';
-import { RankBadge } from '../components/RankBadge';
-import { ProgressBar } from '../components/ProgressBar';
-import { StatsCarousel } from '../components/StatsCarousel';
+import RankBadge from '../components/RankBadge';
+import ProgressBar from '../components/ProgressBar';
+import StatsCarousel from '../components/StatsCarousel';
 import GlowingCard from '../components/GlowingCard';
 import { 
   Sword, 
