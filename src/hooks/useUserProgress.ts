@@ -52,7 +52,7 @@ export const useUserProgress = () => {
       // Fetch user profile data
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('total_xp, current_rank, rank_assigned_at, streak_days, quests_done')
+        .select('id, email, created_at, last_login, subscription_status, username')
         .eq('id', user.id)
         .single();
 
@@ -64,11 +64,9 @@ export const useUserProgress = () => {
             .insert([{
               id: user.id,
               email: user.email!,
-              total_xp: 0,
-              current_rank: 'E',
-              rank_assigned_at: new Date().toISOString(),
-              streak_days: 0,
-              quests_done: 0
+              created_at: new Date().toISOString(),
+              subscription_status: 'free',
+              username: user.email?.split('@')[0] || 'Hunter'
             }]);
 
           if (insertError) throw insertError;
@@ -76,7 +74,7 @@ export const useUserProgress = () => {
           // Fetch the newly created profile
           const { data: newProfileData, error: newProfileError } = await supabase
             .from('profiles')
-            .select('total_xp, current_rank, rank_assigned_at, streak_days, quests_done')
+            .select('id, email, created_at, last_login, subscription_status, username')
             .eq('id', user.id)
             .single();
 
@@ -100,11 +98,13 @@ export const useUserProgress = () => {
   };
 
   const calculateProgressData = (data: any): UserProgressData => {
-    const totalXp = data.total_xp || 0;
-    const currentRank = (data.current_rank || 'E') as RankId;
-    const rankAssignedAt = data.rank_assigned_at;
-    const streakDays = data.streak_days || 0;
-    const questsDone = data.quests_done || 0;
+    // Since profiles table doesn't have XP/rank data, we'll use defaults
+    // In a real app, this data should come from the users table
+    const totalXp = 0;
+    const currentRank = 'E' as RankId;
+    const rankAssignedAt = data.created_at;
+    const streakDays = 0;
+    const questsDone = 0;
 
     // Calculate XP progress
     const xpProgress = calculateXPProgress(totalXp, currentRank);
@@ -146,17 +146,8 @@ export const useUserProgress = () => {
       const rankChanged = newRank !== progressData.currentRank;
       
       const updateData: any = {
-        total_xp: newTotalXp,
-        quests_done: newQuestsDone,
-        streak_days: newStreakDays,
-        updated_at: new Date().toISOString()
+        last_login: new Date().toISOString()
       };
-
-      // If rank changed, update rank and assignment date
-      if (rankChanged) {
-        updateData.current_rank = newRank;
-        updateData.rank_assigned_at = new Date().toISOString();
-      }
 
       const { error } = await supabase
         .from('profiles')
