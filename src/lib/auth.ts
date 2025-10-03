@@ -110,7 +110,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
 export const getUserProfile = async (userId: string): Promise<AuthUser | null> => {
   try {
     const { data, error } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -127,7 +127,7 @@ export const getUserProfile = async (userId: string): Promise<AuthUser | null> =
 export const updateUserProfile = async (userId: string, updates: Partial<AuthUser>) => {
   try {
     const { data, error } = await supabase
-      .from('users')
+      .from('profiles')
       .update(updates)
       .eq('id', userId)
       .select()

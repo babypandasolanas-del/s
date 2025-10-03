@@ -44,7 +44,7 @@ export const createUserProfile = async (userData: {
   streak_days: number;
 }) => {
   const { data, error } = await supabase
-    .from('users')
+    .from('profiles')
     .upsert([userData])
     .select()
     .single();
@@ -53,11 +53,10 @@ export const createUserProfile = async (userData: {
 
 export const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
-    .from('users')
+    .from('profiles')
     .select(`
       *,
-      user_stats(*),
-      guilds(*)
+      subscriptions(*)
     `)
     .eq('id', userId)
     .single();
@@ -66,7 +65,7 @@ export const getUserProfile = async (userId: string) => {
 
 export const updateUserProfile = async (userId: string, updates: any) => {
   const { data, error } = await supabase
-    .from('users')
+    .from('profiles')
     .update(updates)
     .eq('id', userId)
     .select()

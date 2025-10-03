@@ -41,6 +41,30 @@ export default function HunterDashboard() {
 
   const initializeDailyQuests = async () => {
     try {
+      // First ensure user exists in users table for foreign key constraint
+      if (user) {
+        const { error: userError } = await supabase
+          .from('users')
+          .upsert([{
+            id: user.id,
+            email: user.email!,
+            name: user.email?.split('@')[0] || 'Hunter',
+            rank: 'E',
+            total_xp: 0,
+            streak_days: 0,
+            subscription_active: false,
+            last_active: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }], { onConflict: 'id' })
+          .select()
+          .single();
+        
+        if (userError && userError.code !== '23505') { // Ignore unique constraint violations
+          console.error('Error ensuring user exists:', userError);
+        }
+      }
+
       const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabase
         .from('quests')
