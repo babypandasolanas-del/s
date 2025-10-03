@@ -105,6 +105,7 @@ export default function HunterDashboard() {
             ? { ...quest, completed: true }
             : quest
         )
+      );
     } catch (error) {
       console.error('Error completing quest:', error);
       // Update local state even if database update fails
@@ -191,6 +192,7 @@ export default function HunterDashboard() {
             <div className="flex items-center justify-between mb-4">
               <Trophy className="w-8 h-8 text-electric-blue" />
               <div className="text-right">
+                <p className="text-electric-blue/60 text-sm font-orbitron">Current Rank</p>
               </div>
             </div>
             <div className="flex justify-center">
@@ -210,12 +212,12 @@ export default function HunterDashboard() {
             <div className="flex items-center justify-between mb-4">
               <Star className="w-8 h-8 text-electric-blue" />
               <div className="text-right">
+                <p className="text-electric-blue/60 text-sm font-orbitron">Total XP</p>
               </div>
             </div>
             <p className="text-2xl font-orbitron font-bold text-white text-glow text-center">
               {progressData?.totalXp?.toLocaleString() || 0}
-            <p className="text-2xl font-orbitron font-bold text-white text-center"
-               style={{ textShadow: '0 0 10px #00f0ff' }}>
+            </p>
           </motion.div>
 
           {/* Streak */}
@@ -228,6 +230,7 @@ export default function HunterDashboard() {
             }}
           >
             <div className="flex items-center justify-between mb-4">
+              <Flame className="w-8 h-8 text-electric-blue" />
               <div className="text-right">
                 <p className="text-electric-blue/60 text-sm font-orbitron">Streak</p>
               </div>
@@ -248,6 +251,7 @@ export default function HunterDashboard() {
             }}
           >
             <div className="flex items-center justify-between mb-4">
+              <Calendar className="w-8 h-8 text-electric-blue" />
               <div className="text-right">
                 <p className="text-electric-blue/60 text-sm font-orbitron">Today's Progress</p>
               </div>
@@ -356,13 +360,6 @@ export default function HunterDashboard() {
                 </p>
               </motion.div>
             )}
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-            </div>
           </div>
         </motion.div>
       </div>
