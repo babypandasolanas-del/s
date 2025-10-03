@@ -85,7 +85,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
   
   return [
     {
-      id: `${rank}-mind-${Date.now()}`,
+      id: crypto.randomUUID(),
       title: templates.mind.title,
       description: templates.mind.description,
       category: 'mind' as Category,
@@ -94,7 +94,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       completed: false
     },
     {
-      id: `${rank}-body-${Date.now() + 1}`,
+      id: crypto.randomUUID(),
       title: templates.body.title,
       description: templates.body.description,
       category: 'body' as Category,
@@ -103,7 +103,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       completed: false
     },
     {
-      id: `${rank}-discipline-${Date.now() + 2}`,
+      id: crypto.randomUUID(),
       title: templates.discipline.title,
       description: templates.discipline.description,
       category: 'discipline' as Category,
@@ -112,7 +112,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       completed: false
     },
     {
-      id: `${rank}-social-${Date.now() + 3}`,
+      id: crypto.randomUUID(),
       title: templates.social.title,
       description: templates.social.description,
       category: 'lifestyle' as Category, // Map to existing category
@@ -121,7 +121,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       completed: false
     },
     {
-      id: `${rank}-spirit-${Date.now() + 4}`,
+      id: crypto.randomUUID(),
       title: templates.spirit.title,
       description: templates.spirit.description,
       category: 'willpower' as Category, // Map to existing category
@@ -130,7 +130,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       completed: false
     },
     {
-      id: `${rank}-skill-${Date.now() + 5}`,
+      id: crypto.randomUUID(),
       title: templates.skill.title,
       description: templates.skill.description,
       category: 'focus' as Category, // Map to existing category
