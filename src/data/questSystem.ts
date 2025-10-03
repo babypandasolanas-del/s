@@ -89,7 +89,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       title: templates.mind.title,
       description: templates.mind.description,
       category: 'mind' as Category,
-      xpReward: templates.mind.xp,
+      xp_reward: templates.mind.xp,
       difficulty: 'medium' as const,
       completed: false
     },
@@ -98,7 +98,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       title: templates.body.title,
       description: templates.body.description,
       category: 'body' as Category,
-      xpReward: templates.body.xp,
+      xp_reward: templates.body.xp,
       difficulty: 'medium' as const,
       completed: false
     },
@@ -107,7 +107,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       title: templates.discipline.title,
       description: templates.discipline.description,
       category: 'discipline' as Category,
-      xpReward: templates.discipline.xp,
+      xp_reward: templates.discipline.xp,
       difficulty: 'medium' as const,
       completed: false
     },
@@ -116,7 +116,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       title: templates.social.title,
       description: templates.social.description,
       category: 'lifestyle' as Category, // Map to existing category
-      xpReward: templates.social.xp,
+      xp_reward: templates.social.xp,
       difficulty: 'medium' as const,
       completed: false
     },
@@ -125,7 +125,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       title: templates.spirit.title,
       description: templates.spirit.description,
       category: 'willpower' as Category, // Map to existing category
-      xpReward: templates.spirit.xp,
+      xp_reward: templates.spirit.xp,
       difficulty: 'medium' as const,
       completed: false
     },
@@ -134,7 +134,7 @@ export const generateDailyQuests = (rank: Rank): Quest[] => {
       title: templates.skill.title,
       description: templates.skill.description,
       category: 'focus' as Category, // Map to existing category
-      xpReward: templates.skill.xp,
+      xp_reward: templates.skill.xp,
       difficulty: 'medium' as const,
       completed: false
     }

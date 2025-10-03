@@ -36,7 +36,7 @@ export interface Quest {
   title: string;
   description: string;
   category: Category;
-  xpReward: number;
+  xp_reward: number;
   difficulty: 'easy' | 'medium' | 'hard';
   completed: boolean;
 }
