@@ -32,14 +32,19 @@ export default function HunterDashboard() {
   const { progressData, loading } = useUserProgress();
   const [quests, setQuests] = useState<Quest[]>([]);
   const [loadingQuests, setLoadingQuests] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user && !isInitializing) {
       initializeDailyQuests();
     }
   }, [user]);
 
   const initializeDailyQuests = async () => {
+    // Prevent multiple simultaneous initializations
+    if (isInitializing) return;
+
+    setIsInitializing(true);
     try {
       // First ensure user exists in users table for foreign key constraint
       if (user) {
@@ -59,13 +64,15 @@ export default function HunterDashboard() {
           }], { onConflict: 'id' })
           .select()
           .single();
-        
+
         if (userError && userError.code !== '23505') { // Ignore unique constraint violations
           console.error('Error ensuring user exists:', userError);
         }
       }
 
       const today = new Date().toISOString().split('T')[0];
+
+      // Check if quests already exist for today
       const { data, error } = await supabase
         .from('quests')
         .select('*')
@@ -74,27 +81,43 @@ export default function HunterDashboard() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
-      // If no quests exist for today, generate them
-      if (!data || data.length === 0) {
-        const currentRank = progressData?.currentRank || 'E';
-        const generatedQuests = generateDailyQuests(currentRank);
-        
-        // Save to database
-        await createDailyQuests(user?.id!, generatedQuests);
-        
-        // Fetch the newly created quests
-        const { data: newQuests, error: newError } = await supabase
+
+      // If quests already exist for today, just load them
+      if (data && data.length > 0) {
+        setQuests(data);
+        return;
+      }
+
+      // Only generate new quests if none exist for today
+      const currentRank = progressData?.currentRank || 'E';
+      const generatedQuests = generateDailyQuests(currentRank);
+
+      // Save to database
+      const { data: createdQuests, error: createError } = await createDailyQuests(user?.id!, generatedQuests);
+
+      if (createError) {
+        console.error('Error creating quests:', createError);
+        // If creation failed, fetch again to see if another process created them
+        const { data: refetchData, error: refetchError } = await supabase
           .from('quests')
           .select('*')
           .eq('user_id', user?.id)
           .eq('quest_date', today)
           .order('created_at', { ascending: false });
-          
-        if (newError) throw newError;
-        setQuests(newQuests || []);
+
+        if (!refetchError && refetchData && refetchData.length > 0) {
+          setQuests(refetchData);
+          return;
+        }
+
+        // Fallback to local quests if all else fails
+        const fallbackQuests = generatedQuests.map(quest => ({
+          ...quest,
+          quest_date: today
+        }));
+        setQuests(fallbackQuests);
       } else {
-        setQuests(data);
+        setQuests(createdQuests || []);
       }
     } catch (error) {
       console.error('Error fetching quests:', error);
@@ -107,6 +130,7 @@ export default function HunterDashboard() {
       setQuests(fallbackQuests);
     } finally {
       setLoadingQuests(false);
+      setIsInitializing(false);
     }
   };
 

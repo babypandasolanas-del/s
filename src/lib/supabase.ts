@@ -95,7 +95,12 @@ export const updateUserStats = async (userId: string, stats: any) => {
 
 // Quest functions
 export const createDailyQuests = async (userId: string, quests: any[]) => {
-  const questsWithUserId = quests.map(quest => ({ ...quest, user_id: userId }));
+  const today = new Date().toISOString().split('T')[0];
+  const questsWithUserId = quests.map(quest => ({
+    ...quest,
+    user_id: userId,
+    quest_date: today
+  }));
   const { data, error } = await supabase
     .from('quests')
     .insert(questsWithUserId)
