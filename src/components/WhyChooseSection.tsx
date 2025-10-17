@@ -81,8 +81,8 @@ const WhyChooseSection: React.FC = () => {
           <motion.div
             key={i}
             className="absolute w-1 h-1 rounded-full opacity-30"
-            style={{ backgroundColor: '#00F0FF' }}
             style={{
+              backgroundColor: '#00F0FF',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
