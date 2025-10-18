@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Shield, CheckCircle, Check, AlertCircle } from 'lucide-react';
-import { signUp, signIn, verifyOTP, resendOTP, validateEmail, getPasswordValidation, validateUsername } from '../lib/auth';
+import { signUp, signIn, verifyOTP, resendOTP, validateEmail, getPasswordValidation, validateUsername, ensureOwnerAccount } from '../lib/auth';
 import GlowingCard from './GlowingCard';
 
 interface AuthModalProps {
@@ -100,13 +100,25 @@ const AuthModal: React.FC<AuthModalProps> = ({
           }
         }
       } else {
-        result = await signIn(email, password);
-        if (result.error) {
-          setErrors({ general: result.error });
+        // Check if this is the owner email attempting login
+        if (email === 'selflevelings@gmail.com') {
+          const ownerResult = await ensureOwnerAccount(email, password);
+          if (ownerResult.success) {
+            onSuccess();
+            onClose();
+            resetForm();
+          } else {
+            setErrors({ general: ownerResult.error || 'Login failed' });
+          }
         } else {
-          onSuccess();
-          onClose();
-          resetForm();
+          result = await signIn(email, password);
+          if (result.error) {
+            setErrors({ general: result.error });
+          } else {
+            onSuccess();
+            onClose();
+            resetForm();
+          }
         }
       }
     } catch (error: any) {

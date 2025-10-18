@@ -175,3 +175,61 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
     callback(session?.user || null);
   });
 };
+
+// Check if email is owner
+export const isOwnerEmail = (email: string | undefined): boolean => {
+  return email === 'selflevelings@gmail.com';
+};
+
+// Auto-create owner account if login fails
+export const ensureOwnerAccount = async (email: string, password: string) => {
+  if (!isOwnerEmail(email)) {
+    return { success: false, error: 'Not owner email' };
+  }
+
+  try {
+    // Try to sign in first
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (!signInError && signInData.user) {
+      return { success: true, user: signInData.user, error: null };
+    }
+
+    // If sign in fails with invalid credentials, try to create account
+    if (signInError?.message?.toLowerCase().includes('invalid')) {
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: 'Owner'
+          },
+          emailRedirectTo: `${window.location.origin}`
+        }
+      });
+
+      if (signUpError) {
+        return { success: false, error: signUpError.message };
+      }
+
+      // After successful signup, try signing in again
+      const { data: finalSignIn, error: finalError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (finalError) {
+        return { success: false, error: finalError.message };
+      }
+
+      return { success: true, user: finalSignIn.user, error: null };
+    }
+
+    return { success: false, error: signInError?.message || 'Login failed' };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+};

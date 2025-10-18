@@ -3,12 +3,12 @@ import { useAuth } from './useAuth';
 import { supabase } from '../lib/supabase';
 
 export const useSubscription = () => {
-  const { user } = useAuth();
+  const { user, isOwner } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>('free');
   const [loading, setLoading] = useState(true);
 
-  // Admin bypass - hardcoded for security
-  const isAdminEmail = user?.email === 'selflevelings@gmail.com';
+  // Owner bypass - uses isOwner from useAuth hook
+  const isAdminEmail = isOwner || user?.email === 'selflevelings@gmail.com';
 
   useEffect(() => {
     if (user) {
