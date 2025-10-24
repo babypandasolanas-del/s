@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProgress } from '../hooks/useUserProgress';
 import { supabase, createDailyQuests } from '../lib/supabase';
-import { generateDailyQuests } from '../data/questSystem';
+import { generateDailyQuests, getXpRequiredForNextRank, getXpRequiredForCurrentRank, getNextRank } from '../data/questSystem';
 import RankBadge from '../components/RankBadge';
 import ProgressBar from '../components/ProgressBar';
 import GlowingCard from '../components/GlowingCard';
-import { 
-  Target, 
-  Trophy, 
+import HunterSummary from '../components/HunterSummary';
+import RankProgress from '../components/RankProgress';
+import HunterStreak from '../components/HunterStreak';
+import RadarChart from '../components/RadarChart';
+import {
+  Target,
+  Trophy,
   Calendar,
   Flame,
   Star,
-  Zap
+  Zap,
+  CheckCircle,
+  Users,
+  Shield,
+  Settings,
+  LogOut
 } from 'lucide-react';
 
 interface Quest {
@@ -28,11 +37,13 @@ interface Quest {
 }
 
 export default function HunterDashboard() {
-  const { user } = useAuth();
+  const { user, isOwner } = useAuth();
   const { progressData, loading } = useUserProgress();
   const [quests, setQuests] = useState<Quest[]>([]);
   const [loadingQuests, setLoadingQuests] = useState(true);
   const [isInitializing, setIsInitializing] = useState(false);
+  const [completingQuest, setCompletingQuest] = useState<string | null>(null);
+  const [showLevelUp, setShowLevelUp] = useState(false);
 
   useEffect(() => {
     if (user && !isInitializing) {
@@ -135,35 +146,51 @@ export default function HunterDashboard() {
   };
 
   const completeQuest = async (questId: string) => {
+    setCompletingQuest(questId);
+
     try {
       const { error } = await supabase
         .from('quests')
-        .update({ 
-          completed: true, 
-          completed_at: new Date().toISOString() 
+        .update({
+          completed: true,
+          completed_at: new Date().toISOString()
         })
         .eq('id', questId);
 
       if (error) throw error;
-      
-      // Refresh quests
-      setQuests(prevQuests => 
-        prevQuests.map(quest => 
-          quest.id === questId 
+
+      // Update local state
+      setQuests(prevQuests =>
+        prevQuests.map(quest =>
+          quest.id === questId
             ? { ...quest, completed: true }
             : quest
         )
       );
+
+      // Check if all quests are now complete
+      const updatedQuests = quests.map(q =>
+        q.id === questId ? { ...q, completed: true } : q
+      );
+      const allComplete = updatedQuests.every(q => q.completed);
+
+      if (allComplete) {
+        setTimeout(() => setShowLevelUp(true), 500);
+        setTimeout(() => setShowLevelUp(false), 3000);
+      }
+
+      setTimeout(() => setCompletingQuest(null), 1000);
     } catch (error) {
       console.error('Error completing quest:', error);
       // Update local state even if database update fails
-      setQuests(prevQuests => 
-        prevQuests.map(quest => 
-          quest.id === questId 
+      setQuests(prevQuests =>
+        prevQuests.map(quest =>
+          quest.id === questId
             ? { ...quest, completed: true }
             : quest
         )
       );
+      setTimeout(() => setCompletingQuest(null), 1000);
     }
   };
 

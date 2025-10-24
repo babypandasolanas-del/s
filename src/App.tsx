@@ -14,6 +14,7 @@ import LockedRankReveal from './pages/LockedRankReveal';
 import UpgradePage from './pages/UpgradePage';
 import RankReveal from './pages/RankReveal';
 import HunterDashboard from './pages/HunterDashboard';
+import HunterDashboard2 from './pages/HunterDashboard2';
 import { useAuth } from './hooks/useAuth';
 import { useSubscription } from './hooks/useSubscription';
 import { signOut } from './lib/auth';
@@ -302,13 +303,7 @@ function App() {
         )}
 
         {currentState === 'dashboard' && hunterData && (
-          <HunterDashboard 
-            rank={hunterData.rank}
-            totalScore={hunterData.totalScore}
-            streak={hunterData.streak}
-            totalXp={hunterData.totalXp}
-            onUpdateProgress={handleUpdateProgress}
-          />
+          <HunterDashboard2 />
         )}
 
         {/* Auth Guard for Unauthenticated Users */}
