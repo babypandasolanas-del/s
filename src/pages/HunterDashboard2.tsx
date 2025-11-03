@@ -516,13 +516,6 @@ export default function HunterDashboard2() {
           </motion.div>
         )}
 
-        {/* Training Modal */}
-        <TrainingModal
-          isOpen={showTrainingModal}
-          onClose={() => setShowTrainingModal(false)}
-          userRank={currentRank}
-          onSessionComplete={handleTrainingSessionComplete}
-        />
       </div>
     </div>
   );
